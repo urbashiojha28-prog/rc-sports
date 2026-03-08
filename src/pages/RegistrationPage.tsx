@@ -7,7 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import heroBanner from "@/assets/hero-banner.jpg";
-import sportsIllustration from "@/assets/sports-illustration.png";
+import sportsIllustration from "@/assets/signup-illustration.jpg";
 import { User, Phone, Home, GraduationCap } from "lucide-react";
 
 interface Game {
@@ -288,14 +288,11 @@ const RegistrationPage = () => {
                 </div>
 
                 {/* Right: Illustration */}
-                <div className="hidden md:flex items-center justify-center p-8 w-[320px] lg:w-[380px]" style={{
-                  background: 'linear-gradient(180deg, hsl(220 25% 6%), hsl(220 25% 10%))',
-                }}>
+                <div className="hidden md:block w-[320px] lg:w-[380px] relative overflow-hidden rounded-r-2xl">
                   <img
                     src={sportsIllustration}
                     alt="Sports Championship"
-                    className="w-full h-auto rounded-2xl object-cover"
-                    style={{ boxShadow: '0 0 40px hsl(28 100% 55% / 0.2)' }}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
