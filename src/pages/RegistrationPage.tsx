@@ -207,7 +207,7 @@ const RegistrationPage = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your full name (e.g. Rahul Sharma)"
                       maxLength={100}
                       required
                     />
