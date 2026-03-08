@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getGameImage } from "@/lib/gameImages";
-import { CheckCircle2, Share2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import heroBanner from "@/assets/hero-banner.jpg";
@@ -89,11 +89,6 @@ const RegistrationPage = () => {
     })();
   };
 
-  const handleWhatsAppShare = () => {
-    const url = window.location.href;
-    const text = `🏆 ${siteTitle}\n${siteSubtitle}\n\nRegister here: ${url}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,16 +150,9 @@ const RegistrationPage = () => {
           <h1 className="font-heading text-5xl text-foreground mb-4">
             You're In!
           </h1>
-          <p className="text-muted-foreground text-lg max-w-md mx-auto mb-6">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
             Your registration has been submitted successfully. Get ready to compete! 🏆
           </p>
-          <button
-            onClick={handleWhatsAppShare}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-medium hover:opacity-90 transition-opacity"
-          >
-            <Share2 className="w-5 h-5" />
-            Share on WhatsApp
-          </button>
         </div>
       </div>
     );
@@ -188,15 +176,6 @@ const RegistrationPage = () => {
           <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             {siteSubtitle}
           </p>
-          {/* WhatsApp Share Button */}
-          <button
-            onClick={handleWhatsAppShare}
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] text-white text-sm font-medium hover:opacity-90 transition-all hover:scale-105 animate-fade-in-up"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <Share2 className="w-4 h-4" />
-            Share with Neighbors
-          </button>
         </div>
       </div>
 
