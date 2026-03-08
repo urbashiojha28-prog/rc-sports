@@ -12,6 +12,8 @@ interface Registration {
   tower: string;
   flat_no: string;
   contact_number: string;
+  class: string | null;
+  gender: string | null;
   created_at: string;
   games: string[];
 }
