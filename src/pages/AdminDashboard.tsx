@@ -41,12 +41,40 @@ const AdminDashboard = () => {
   const [newGameName, setNewGameName] = useState("");
   const [newGameDesc, setNewGameDesc] = useState("");
   const [newGameImage, setNewGameImage] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   // Editing game state
   const [editingGameId, setEditingGameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [editImage, setEditImage] = useState("");
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("game-images").upload(fileName, file);
+      if (error) { toast.error("Upload failed: " + error.message); return null; }
+      const { data: { publicUrl } } = supabase.storage.from("game-images").getPublicUrl(fileName);
+      return publicUrl;
+    } catch {
+      toast.error("Upload failed");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "new" | "edit") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadImage(file);
+    if (url) {
+      if (target === "new") setNewGameImage(url);
+      else setEditImage(url);
+    }
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
