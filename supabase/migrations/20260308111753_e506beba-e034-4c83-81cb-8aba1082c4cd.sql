@@ -1,0 +1,1 @@
+UPDATE public.games SET name = 'Kho Kho' WHERE name = 'Kho Kho(class 5-12 only)';
