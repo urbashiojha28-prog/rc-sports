@@ -118,6 +118,8 @@ const RegistrationPage = () => {
           tower: tower.trim(),
           flat_no: flatNo.trim(),
           contact_number: contact.trim(),
+          class: studentClass.trim(),
+          gender: gender,
         });
 
       if (regError) throw regError;
