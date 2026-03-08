@@ -440,6 +440,7 @@ const AdminDashboard = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">This image appears behind the title on the homepage. Click Save to apply.</p>
+              </div>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
                 <button
