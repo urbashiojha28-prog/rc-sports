@@ -98,7 +98,7 @@ const RegistrationPage = () => {
       toast.error("Please select at least 1 game!");
       return;
     }
-    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim()) {
+    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim() || !studentClass.trim() || !gender) {
       toast.error("Please fill all fields!");
       return;
     }
