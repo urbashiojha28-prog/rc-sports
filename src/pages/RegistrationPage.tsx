@@ -137,7 +137,7 @@ const RegistrationPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
-            backgroundImage: `url(${heroBanner})`,
+            backgroundImage: `url(${settings?.hero_image && settings.hero_image.startsWith("http") ? settings.hero_image : heroBanner})`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
