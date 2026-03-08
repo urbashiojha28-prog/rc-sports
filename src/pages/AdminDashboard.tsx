@@ -12,6 +12,8 @@ interface Registration {
   tower: string;
   flat_no: string;
   contact_number: string;
+  class: string | null;
+  gender: string | null;
   created_at: string;
   games: string[];
 }
@@ -209,12 +211,14 @@ const AdminDashboard = () => {
   const handleExportCSV = () => {
     const data = filteredRegistrations;
     if (data.length === 0) { toast.error("No data to export"); return; }
-    const headers = ["Name", "Tower", "Flat", "Contact", "Games", "Date"];
+    const headers = ["Name", "Tower", "Flat", "Contact", "Class", "Gender", "Games", "Date"];
     const rows = data.map(r => [
       r.participant_name,
       r.tower,
       r.flat_no,
       r.contact_number,
+      r.class || '',
+      r.gender || '',
       r.games.join("; "),
       new Date(r.created_at).toLocaleDateString(),
     ]);
@@ -307,6 +311,8 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Tower</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Flat</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Contact</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Class</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Gender</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
                       <th className="py-3 px-4"></th>
@@ -319,6 +325,8 @@ const AdminDashboard = () => {
                         <td className="py-3 px-4 text-foreground">{reg.tower}</td>
                         <td className="py-3 px-4 text-foreground">{reg.flat_no}</td>
                         <td className="py-3 px-4 text-foreground">{reg.contact_number}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.class || '-'}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.gender || '-'}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-1 flex-wrap">
                             {reg.games.map(g => (
