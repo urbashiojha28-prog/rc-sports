@@ -7,7 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import heroBanner from "@/assets/hero-banner.jpg";
-import sportsIllustration from "@/assets/signup-illustration.jpg";
+import sportsIllustration from "@/assets/sports-illustration.png";
 import { User, Phone, Home, GraduationCap } from "lucide-react";
 
 interface Game {
