@@ -4,6 +4,7 @@ import longJumpImg from "@/assets/long-jump.jpg";
 import spoonLemonImg from "@/assets/spoon-lemon-race.jpg";
 import musicalChairImg from "@/assets/musical-chair.jpg";
 import drawingImg from "@/assets/drawing-competition.jpg";
+import volleyballImg from "@/assets/volleyball.jpg";
 
 const imageMap: Record<string, string> = {
   "kho-kho": khoKhoImg,
@@ -12,6 +13,7 @@ const imageMap: Record<string, string> = {
   "spoon-lemon-race": spoonLemonImg,
   "musical-chair": musicalChairImg,
   "drawing-competition": drawingImg,
+  "volleyball": volleyballImg,
 };
 
 export const getGameImage = (imageKey: string | null): string => {
