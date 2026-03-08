@@ -323,6 +323,8 @@ const AdminDashboard = () => {
                         <td className="py-3 px-4 text-foreground">{reg.tower}</td>
                         <td className="py-3 px-4 text-foreground">{reg.flat_no}</td>
                         <td className="py-3 px-4 text-foreground">{reg.contact_number}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.class || '-'}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.gender || '-'}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-1 flex-wrap">
                             {reg.games.map(g => (
