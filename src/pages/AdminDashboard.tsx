@@ -36,6 +36,7 @@ const AdminDashboard = () => {
   const [siteTitle, setSiteTitle] = useState("");
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [registrationOpen, setRegistrationOpen] = useState(true);
+  const [heroImage, setHeroImage] = useState("");
 
   // New game state
   const [newGameName, setNewGameName] = useState("");
