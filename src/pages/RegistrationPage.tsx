@@ -20,6 +20,8 @@ const RegistrationPage = () => {
   const [tower, setTower] = useState("");
   const [flatNo, setFlatNo] = useState("");
   const [contact, setContact] = useState("");
+  const [studentClass, setStudentClass] = useState("");
+  const [gender, setGender] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ const RegistrationPage = () => {
       toast.error("Please select at least 1 game!");
       return;
     }
-    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim()) {
+    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim() || !studentClass.trim() || !gender) {
       toast.error("Please fill all fields!");
       return;
     }
@@ -116,6 +118,8 @@ const RegistrationPage = () => {
           tower: tower.trim(),
           flat_no: flatNo.trim(),
           contact_number: contact.trim(),
+          class: studentClass.trim(),
+          gender: gender,
         });
 
       if (regError) throw regError;
@@ -304,6 +308,38 @@ const RegistrationPage = () => {
                     placeholder="10-digit number"
                     required
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
+                      Class
+                    </label>
+                    <input
+                      type="text"
+                      value={studentClass}
+                      onChange={(e) => setStudentClass(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                      placeholder="e.g. 10th"
+                      maxLength={20}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
+                      Gender
+                    </label>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
 
                 {selectedGames.length > 0 && (
