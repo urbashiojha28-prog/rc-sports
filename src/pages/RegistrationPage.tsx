@@ -137,7 +137,7 @@ const RegistrationPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
-            backgroundImage: `url(${(await import("@/assets/hero-banner.jpg")).default})`,
+            backgroundImage: `url(${heroBanner})`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
