@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check } from "lucide-react";
+import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
 
 interface Registration {

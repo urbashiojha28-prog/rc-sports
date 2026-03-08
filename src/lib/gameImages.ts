@@ -16,6 +16,8 @@ const imageMap: Record<string, string> = {
 
 export const getGameImage = (imageKey: string | null): string => {
   if (!imageKey) return cricketImg;
+  // If it's a URL (uploaded image), return as-is
+  if (imageKey.startsWith("http")) return imageKey;
   return imageMap[imageKey] || cricketImg;
 };
 
