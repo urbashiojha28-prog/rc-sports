@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGameImage } from "@/lib/gameImages";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import heroBanner from "@/assets/hero-banner.jpg";
 
 interface Game {
   id: string;
