@@ -155,16 +155,9 @@ const RegistrationPage = () => {
           <h1 className="font-heading text-5xl text-foreground mb-4">
             You're In!
           </h1>
-          <p className="text-muted-foreground text-lg max-w-md mx-auto mb-6">
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
             Your registration has been submitted successfully. Get ready to compete! 🏆
           </p>
-          <button
-            onClick={handleWhatsAppShare}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-medium hover:opacity-90 transition-opacity"
-          >
-            <Share2 className="w-5 h-5" />
-            Share on WhatsApp
-          </button>
         </div>
       </div>
     );
