@@ -169,128 +169,137 @@ const RegistrationPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{
-            backgroundImage: `url(${settings?.hero_image && settings.hero_image.startsWith("http") ? settings.hero_image : heroBanner})`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
-        <div className="relative z-10 container mx-auto px-4 py-12 md:py-24 text-center">
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-gradient mb-4 animate-fade-in-up">
-            {siteTitle}
-          </h1>
-          <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            {siteSubtitle}
-          </p>
-        </div>
-      </div>
-
       {!registrationOpen ? (
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h2 className="font-heading text-3xl sm:text-4xl text-foreground">Registrations are currently closed</h2>
-          <p className="text-muted-foreground mt-4">Check back later!</p>
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center">
+            <h2 className="font-heading text-3xl sm:text-4xl text-foreground">Registrations are currently closed</h2>
+            <p className="text-muted-foreground mt-4">Check back later!</p>
+          </div>
         </div>
       ) : (
-        <div className="container mx-auto px-4 pb-16">
+        <div className="pb-16">
           {step === "details" && (
-            <section className="max-w-lg mx-auto" ref={formRef}>
-              <div className="bg-card rounded-xl p-5 sm:p-6 md:p-8 ring-1 ring-border shadow-[0_8px_40px_hsl(var(--primary)/0.08)]">
-                <h2 className="font-heading text-2xl sm:text-3xl text-foreground mb-6 text-center">
-                  Your Details
-                </h2>
-                <form onSubmit={handleDetailsSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Full Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                      placeholder="Enter your full name (e.g. Rahul Sharma)"
-                      maxLength={100}
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-1">Tower</label>
-                      <input
-                        type="text"
-                        value={tower}
-                        onChange={(e) => setTower(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                        placeholder="e.g. Tower A"
-                        maxLength={50}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-1">Flat No</label>
-                      <input
-                        type="text"
-                        value={flatNo}
-                        onChange={(e) => setFlatNo(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                        placeholder="e.g. 101"
-                        maxLength={20}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Contact Number</label>
-                    <input
-                      type="tel"
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                      className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                      placeholder="10-digit number"
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-1">Class</label>
-                      <select
-                        value={studentClass}
-                        onChange={(e) => setStudentClass(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                        required
-                      >
-                        <option value="">Select</option>
-                        {["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","Senior"].map(c => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-muted-foreground mb-1">Gender</label>
-                      <select
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                        required
-                      >
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                  </div>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{
+              background: 'linear-gradient(135deg, hsl(28 100% 20%), hsl(220 25% 8%), hsl(28 80% 15%))'
+            }}>
+              <div className="w-full max-w-4xl flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl" ref={formRef}>
+                {/* Left: Glassmorphism Form */}
+                <div className="flex-1 p-6 sm:p-8 md:p-10" style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                }}>
+                  <h2 className="font-heading text-3xl sm:text-4xl text-foreground mb-1 text-center">
+                    {siteTitle}
+                  </h2>
+                  <p className="text-muted-foreground text-sm text-center mb-6">{siteSubtitle}</p>
 
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-heading text-xl tracking-wider hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Next: Choose Games →
-                  </button>
-                </form>
+                  <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                        placeholder="Full Name"
+                        maxLength={100}
+                        required
+                      />
+                      <User className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                        placeholder="Contact Number (10 digits)"
+                        required
+                      />
+                      <Phone className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={tower}
+                          onChange={(e) => setTower(e.target.value)}
+                          className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                          placeholder="Tower"
+                          maxLength={50}
+                          required
+                        />
+                        <Home className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={flatNo}
+                          onChange={(e) => setFlatNo(e.target.value)}
+                          className="w-full px-4 py-3 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                          placeholder="Flat No"
+                          maxLength={20}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="relative">
+                        <select
+                          value={studentClass}
+                          onChange={(e) => setStudentClass(e.target.value)}
+                          className="w-full px-4 py-3 pr-8 bg-transparent border-b-2 border-muted-foreground/30 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none"
+                          required
+                        >
+                          <option value="" className="bg-card">Class</option>
+                          {["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","Senior"].map(c => (
+                            <option key={c} value={c} className="bg-card">{c}</option>
+                          ))}
+                        </select>
+                        <GraduationCap className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                      </div>
+                      <div>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full px-4 py-3 bg-transparent border-b-2 border-muted-foreground/30 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none"
+                          required
+                        >
+                          <option value="" className="bg-card">Gender</option>
+                          <option value="Male" className="bg-card">Male</option>
+                          <option value="Female" className="bg-card">Female</option>
+                          <option value="Other" className="bg-card">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full py-3.5 mt-2 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-heading text-xl tracking-wider hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                      style={{ boxShadow: '0 4px 20px hsl(28 100% 55% / 0.4)' }}
+                    >
+                      Next: Choose Games →
+                    </button>
+                  </form>
+                </div>
+
+                {/* Right: Illustration */}
+                <div className="hidden md:flex items-center justify-center p-8 w-[320px] lg:w-[380px]" style={{
+                  background: 'linear-gradient(180deg, hsl(220 25% 6%), hsl(220 25% 10%))',
+                }}>
+                  <img
+                    src={sportsIllustration}
+                    alt="Sports Championship"
+                    className="w-full h-auto rounded-2xl object-cover"
+                    style={{ boxShadow: '0 0 40px hsl(28 100% 55% / 0.2)' }}
+                  />
+                </div>
               </div>
-            </section>
+            </div>
           )}
 
           {step === "games" && (
