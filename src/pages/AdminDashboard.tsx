@@ -213,30 +213,26 @@ const AdminDashboard = () => {
 
   const allGameNames = getAllGameNames();
 
-  const handleExportCSV = () => {
+  const handleExportExcel = async () => {
     const data = filteredRegistrations;
     if (data.length === 0) { toast.error("No data to export"); return; }
-    const headers = ["Name", "Tower", "Flat", "Contact", "Class", "Gender", "Games", "Date"];
-    const rows = data.map(r => [
-      r.participant_name,
-      r.tower,
-      r.flat_no,
-      r.contact_number,
-      r.class || '',
-      r.gender || '',
-      r.games.join("; "),
-      new Date(r.created_at).toLocaleDateString(),
-    ]);
-    const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
+    const XLSX = await import("xlsx");
+    const rows = data.map(r => ({
+      Name: r.participant_name,
+      Tower: r.tower,
+      Flat: r.flat_no,
+      Contact: r.contact_number,
+      Class: r.class || '',
+      Gender: r.gender || '',
+      Games: r.games.join("; "),
+      Date: new Date(r.created_at).toLocaleDateString(),
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Registrations");
     const filterLabel = [classFilter !== "all" ? classFilter : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
-    a.download = `registrations${filterLabel ? `-${filterLabel}` : ""}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("CSV downloaded!");
+    XLSX.writeFile(wb, `registrations${filterLabel ? `-${filterLabel}` : ""}.xlsx`);
+    toast.success("Excel file downloaded!");
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
@@ -316,10 +312,10 @@ const AdminDashboard = () => {
                   ))}
                 </select>
                 <button
-                  onClick={handleExportCSV}
+                  onClick={handleExportExcel}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  <Download className="w-4 h-4" /> Export CSV
+                  <Download className="w-4 h-4" /> Export Excel
                 </button>
               </div>
             </div>
