@@ -309,6 +309,8 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Tower</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Flat</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Contact</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Class</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Gender</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
                       <th className="py-3 px-4"></th>
