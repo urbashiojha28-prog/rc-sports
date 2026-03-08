@@ -1,24 +1,23 @@
-import cricketImg from "@/assets/cricket.jpg";
-import badmintonImg from "@/assets/badminton.jpg";
-import chessImg from "@/assets/chess.jpg";
-import carromImg from "@/assets/carrom.jpg";
-import tableTennisImg from "@/assets/table-tennis.jpg";
-import tugOfWarImg from "@/assets/tug-of-war.jpg";
+import khoKhoImg from "@/assets/kho-kho.jpg";
+import meterRaceImg from "@/assets/100-meter-race.jpg";
+import longJumpImg from "@/assets/long-jump.jpg";
+import spoonLemonImg from "@/assets/spoon-lemon-race.jpg";
+import musicalChairImg from "@/assets/musical-chair.jpg";
+import drawingImg from "@/assets/drawing-competition.jpg";
 
 const imageMap: Record<string, string> = {
-  cricket: cricketImg,
-  badminton: badmintonImg,
-  chess: chessImg,
-  carrom: carromImg,
-  "table-tennis": tableTennisImg,
-  "tug-of-war": tugOfWarImg,
+  "kho-kho": khoKhoImg,
+  "100-meter-race": meterRaceImg,
+  "long-jump": longJumpImg,
+  "spoon-lemon-race": spoonLemonImg,
+  "musical-chair": musicalChairImg,
+  "drawing-competition": drawingImg,
 };
 
 export const getGameImage = (imageKey: string | null): string => {
-  if (!imageKey) return cricketImg;
-  // If it's a URL (uploaded image), return as-is
+  if (!imageKey) return khoKhoImg;
   if (imageKey.startsWith("http")) return imageKey;
-  return imageMap[imageKey] || cricketImg;
+  return imageMap[imageKey] || khoKhoImg;
 };
 
 export default imageMap;
