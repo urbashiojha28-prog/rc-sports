@@ -131,6 +131,7 @@ const AdminDashboard = () => {
       setSiteTitle(map.site_title || "");
       setSiteSubtitle(map.site_subtitle || "");
       setRegistrationOpen(map.registration_open !== "false");
+      setHeroImage(map.hero_image || "");
       return map;
     },
   });
