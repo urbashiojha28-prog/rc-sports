@@ -1,0 +1,2 @@
+ALTER TABLE public.registrations DROP CONSTRAINT registrations_unique_name;
+ALTER TABLE public.registrations ADD CONSTRAINT registrations_unique_person UNIQUE (participant_name, class, flat_no, contact_number);
