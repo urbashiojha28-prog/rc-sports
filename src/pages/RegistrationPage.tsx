@@ -176,15 +176,6 @@ const RegistrationPage = () => {
           <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             {siteSubtitle}
           </p>
-          {/* WhatsApp Share Button */}
-          <button
-            onClick={handleWhatsAppShare}
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] text-white text-sm font-medium hover:opacity-90 transition-all hover:scale-105 animate-fade-in-up"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <Share2 className="w-4 h-4" />
-            Share with Neighbors
-          </button>
         </div>
       </div>
 
