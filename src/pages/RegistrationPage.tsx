@@ -303,7 +303,7 @@ const RegistrationPage = () => {
           )}
 
           {step === "games" && (
-            <div>
+            <div className="container mx-auto px-4 pt-8">
               {/* Summary bar */}
               <div className="max-w-5xl mx-auto mb-6">
                 <div className="bg-card rounded-lg p-4 ring-1 ring-border flex flex-wrap items-center justify-between gap-2">
