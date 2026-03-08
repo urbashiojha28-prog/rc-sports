@@ -12,8 +12,8 @@ const boysMapping: GameMapping = {
   "8th": ["100 Meter Running", "Long Jump", "Kho Kho"],
   "9th": ["100 Meter Running", "Long Jump", "Kho Kho"],
   "10th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "11th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "12th": ["100 Meter Running", "Long Jump", "Kho Kho"],
+  "11th": ["Long Jump", "Kho Kho"],
+  "12th": ["Long Jump", "Kho Kho"],
   "Senior": ["Long Jump", "Volleyball"],
 };
 
