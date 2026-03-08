@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image, Download, Filter } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
+import { classGroups, genderOptions, getAllGameNames } from "@/lib/gameMapping";
 
 interface Registration {
   id: string;
@@ -31,6 +32,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
+  const [classFilter, setClassFilter] = useState<string>("all");
+  const [genderFilter, setGenderFilter] = useState<string>("all");
   const [gameFilter, setGameFilter] = useState<string>("all");
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -98,12 +101,9 @@ const AdminDashboard = () => {
     queryFn: async () => {
       const { data: regs, error } = await supabase.from("registrations").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-
       const { data: regGames } = await supabase.from("registration_games").select("registration_id, game_id");
       const { data: allGames } = await supabase.from("games").select("id, name");
-
       const gameMap = new Map(allGames?.map(g => [g.id, g.name]) || []);
-
       return regs.map(r => ({
         ...r,
         games: (regGames || [])
@@ -117,7 +117,6 @@ const AdminDashboard = () => {
     queryKey: ["admin_games"],
     enabled: isAdmin,
     queryFn: async () => {
-      // Admin can see all games including inactive - use a direct query
       const { data, error } = await supabase.from("games").select("*").order("display_order");
       if (error) throw error;
       return data as Game[];
@@ -204,9 +203,15 @@ const AdminDashboard = () => {
     refetchGames();
   };
 
-  const filteredRegistrations = gameFilter === "all"
-    ? registrations
-    : registrations.filter(r => r.games.includes(gameFilter));
+  // Multi-filter registrations
+  const filteredRegistrations = registrations.filter(r => {
+    if (classFilter !== "all" && r.class !== classFilter) return false;
+    if (genderFilter !== "all" && r.gender !== genderFilter) return false;
+    if (gameFilter !== "all" && !r.games.includes(gameFilter)) return false;
+    return true;
+  });
+
+  const allGameNames = getAllGameNames();
 
   const handleExportCSV = () => {
     const data = filteredRegistrations;
@@ -227,7 +232,8 @@ const AdminDashboard = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `registrations${gameFilter !== "all" ? `-${gameFilter}` : ""}.csv`;
+    const filterLabel = [classFilter !== "all" ? classFilter : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
+    a.download = `registrations${filterLabel ? `-${filterLabel}` : ""}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV downloaded!");
@@ -237,7 +243,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="font-heading text-3xl text-foreground">Admin Panel</h1>
@@ -247,7 +252,6 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      {/* Tabs */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex gap-2 mb-6">
           {[
@@ -276,22 +280,41 @@ const AdminDashboard = () => {
               <h2 className="font-heading text-2xl text-foreground">
                 Registrations ({filteredRegistrations.length})
               </h2>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap items-center">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                {/* Class Filter */}
+                <select
+                  value={classFilter}
+                  onChange={(e) => setClassFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="all">All Classes</option>
+                  {classGroups.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {/* Gender Filter */}
+                <select
+                  value={genderFilter}
+                  onChange={(e) => setGenderFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="all">All Genders</option>
+                  {genderOptions.map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
                 {/* Game Filter */}
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-muted-foreground" />
-                  <select
-                    value={gameFilter}
-                    onChange={(e) => setGameFilter(e.target.value)}
-                    className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="all">All Games</option>
-                    {games.map(g => (
-                      <option key={g.id} value={g.name}>{g.name}</option>
-                    ))}
-                  </select>
-                </div>
-                {/* CSV Export */}
+                <select
+                  value={gameFilter}
+                  onChange={(e) => setGameFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="all">All Games</option>
+                  {allGameNames.map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
                 <button
                   onClick={handleExportCSV}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground text-sm transition-colors"
@@ -301,7 +324,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             {filteredRegistrations.length === 0 ? (
-              <p className="text-muted-foreground">No registrations{gameFilter !== "all" ? ` for ${gameFilter}` : ""} yet.</p>
+              <p className="text-muted-foreground">No registrations found for the selected filters.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -353,8 +376,6 @@ const AdminDashboard = () => {
         {activeTab === "games" && (
           <div>
             <h2 className="font-heading text-2xl text-foreground mb-4">Manage Games</h2>
-
-            {/* Add Game */}
             <div className="bg-card rounded-lg p-4 ring-1 ring-border mb-6">
               <h3 className="font-heading text-xl text-foreground mb-3">Add New Game</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -401,7 +422,6 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Game List */}
             <div className="grid gap-3">
               {games.map(game => (
                 <div key={game.id} className="flex items-center gap-4 bg-card rounded-lg p-4 ring-1 ring-border">
