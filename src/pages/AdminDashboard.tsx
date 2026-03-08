@@ -308,13 +308,13 @@ const AdminDashboard = () => {
                   className="px-4 py-2 rounded-md bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Description"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <select
-                    value={newGameImage}
+                    value={newGameImage.startsWith("http") ? "" : newGameImage}
                     onChange={(e) => setNewGameImage(e.target.value)}
                     className="flex-1 px-4 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="">Select image</option>
+                    <option value="">Select preset image</option>
                     <option value="cricket">Cricket</option>
                     <option value="badminton">Badminton</option>
                     <option value="chess">Chess</option>
@@ -322,10 +322,20 @@ const AdminDashboard = () => {
                     <option value="table-tennis">Table Tennis</option>
                     <option value="tug-of-war">Tug of War</option>
                   </select>
+                  <label className="cursor-pointer px-3 py-2 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                    <Upload className="w-4 h-4" />
+                    <span className="text-sm hidden md:inline">{uploading ? "Uploading..." : "Upload"}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, "new")} disabled={uploading} />
+                  </label>
                   <button onClick={handleAddGame} className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                {newGameImage.startsWith("http") && (
+                  <div className="col-span-full flex items-center gap-2 text-sm text-muted-foreground">
+                    <Image className="w-4 h-4" /> Custom image uploaded ✓
+                  </div>
+                )}
               </div>
             </div>
 
