@@ -146,6 +146,7 @@ const AdminDashboard = () => {
       { key: "site_title", value: siteTitle },
       { key: "site_subtitle", value: siteSubtitle },
       { key: "registration_open", value: registrationOpen ? "true" : "false" },
+      { key: "hero_image", value: heroImage },
     ];
     for (const u of updates) {
       await supabase.from("site_settings").update({ value: u.value }).eq("key", u.key);
