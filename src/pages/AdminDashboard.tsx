@@ -202,6 +202,33 @@ const AdminDashboard = () => {
     refetchGames();
   };
 
+  const filteredRegistrations = gameFilter === "all"
+    ? registrations
+    : registrations.filter(r => r.games.includes(gameFilter));
+
+  const handleExportCSV = () => {
+    const data = filteredRegistrations;
+    if (data.length === 0) { toast.error("No data to export"); return; }
+    const headers = ["Name", "Tower", "Flat", "Contact", "Games", "Date"];
+    const rows = data.map(r => [
+      r.participant_name,
+      r.tower,
+      r.flat_no,
+      r.contact_number,
+      r.games.join("; "),
+      new Date(r.created_at).toLocaleDateString(),
+    ]);
+    const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `registrations${gameFilter !== "all" ? `-${gameFilter}` : ""}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV downloaded!");
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
 
   return (
