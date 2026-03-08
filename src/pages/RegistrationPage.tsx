@@ -107,21 +107,21 @@ const RegistrationPage = () => {
 
     setSubmitting(true);
     try {
-      const { data: reg, error: regError } = await supabase
+      const registrationId = crypto.randomUUID();
+      const { error: regError } = await supabase
         .from("registrations")
         .insert({
+          id: registrationId,
           participant_name: name.trim(),
           tower: tower.trim(),
           flat_no: flatNo.trim(),
           contact_number: contact.trim(),
-        })
-        .select("id")
-        .single();
+        });
 
       if (regError) throw regError;
 
       const gameInserts = selectedGames.map((gameId) => ({
-        registration_id: reg.id,
+        registration_id: registrationId,
         game_id: gameId,
       }));
 
