@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check } from "lucide-react";
+import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
 
 interface Registration {
@@ -41,12 +41,40 @@ const AdminDashboard = () => {
   const [newGameName, setNewGameName] = useState("");
   const [newGameDesc, setNewGameDesc] = useState("");
   const [newGameImage, setNewGameImage] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   // Editing game state
   const [editingGameId, setEditingGameId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [editImage, setEditImage] = useState("");
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("game-images").upload(fileName, file);
+      if (error) { toast.error("Upload failed: " + error.message); return null; }
+      const { data: { publicUrl } } = supabase.storage.from("game-images").getPublicUrl(fileName);
+      return publicUrl;
+    } catch {
+      toast.error("Upload failed");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "new" | "edit") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadImage(file);
+    if (url) {
+      if (target === "new") setNewGameImage(url);
+      else setEditImage(url);
+    }
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -280,13 +308,13 @@ const AdminDashboard = () => {
                   className="px-4 py-2 rounded-md bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Description"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <select
-                    value={newGameImage}
+                    value={newGameImage.startsWith("http") ? "" : newGameImage}
                     onChange={(e) => setNewGameImage(e.target.value)}
                     className="flex-1 px-4 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="">Select image</option>
+                    <option value="">Select preset image</option>
                     <option value="cricket">Cricket</option>
                     <option value="badminton">Badminton</option>
                     <option value="chess">Chess</option>
@@ -294,10 +322,20 @@ const AdminDashboard = () => {
                     <option value="table-tennis">Table Tennis</option>
                     <option value="tug-of-war">Tug of War</option>
                   </select>
+                  <label className="cursor-pointer px-3 py-2 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                    <Upload className="w-4 h-4" />
+                    <span className="text-sm hidden md:inline">{uploading ? "Uploading..." : "Upload"}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, "new")} disabled={uploading} />
+                  </label>
                   <button onClick={handleAddGame} className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                {newGameImage.startsWith("http") && (
+                  <div className="col-span-full flex items-center gap-2 text-sm text-muted-foreground">
+                    <Image className="w-4 h-4" /> Custom image uploaded ✓
+                  </div>
+                )}
               </div>
             </div>
 
@@ -307,11 +345,11 @@ const AdminDashboard = () => {
                 <div key={game.id} className="flex items-center gap-4 bg-card rounded-lg p-4 ring-1 ring-border">
                   <img src={getGameImage(editingGameId === game.id ? editImage : game.image_url)} alt={game.name} className="w-16 h-16 rounded-md object-cover" />
                   {editingGameId === game.id ? (
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2">
                       <input value={editName} onChange={e => setEditName(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Name" />
                       <input value={editDesc} onChange={e => setEditDesc(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Description" />
-                      <select value={editImage} onChange={e => setEditImage(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-                        <option value="">No image</option>
+                      <select value={editImage.startsWith("http") ? "" : editImage} onChange={e => setEditImage(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">{editImage.startsWith("http") ? "Custom image" : "No image"}</option>
                         <option value="cricket">Cricket</option>
                         <option value="badminton">Badminton</option>
                         <option value="chess">Chess</option>
@@ -319,6 +357,11 @@ const AdminDashboard = () => {
                         <option value="table-tennis">Table Tennis</option>
                         <option value="tug-of-war">Tug of War</option>
                       </select>
+                      <label className="cursor-pointer px-3 py-2 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">
+                        <Upload className="w-4 h-4" />
+                        <span className="text-sm">{uploading ? "..." : "Upload"}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, "edit")} disabled={uploading} />
+                      </label>
                     </div>
                   ) : (
                     <div className="flex-1">
