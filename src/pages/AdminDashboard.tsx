@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save } from "lucide-react";
+import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
 
 interface Registration {
@@ -41,6 +41,12 @@ const AdminDashboard = () => {
   const [newGameName, setNewGameName] = useState("");
   const [newGameDesc, setNewGameDesc] = useState("");
   const [newGameImage, setNewGameImage] = useState("");
+
+  // Editing game state
+  const [editingGameId, setEditingGameId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [editImage, setEditImage] = useState("");
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -142,6 +148,26 @@ const AdminDashboard = () => {
     await supabase.from("registrations").delete().eq("id", id);
     queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
     toast.success("Registration deleted");
+  };
+
+  const startEditing = (game: Game) => {
+    setEditingGameId(game.id);
+    setEditName(game.name);
+    setEditDesc(game.description || "");
+    setEditImage(game.image_url || "");
+  };
+
+  const handleSaveGame = async () => {
+    if (!editingGameId || !editName.trim()) return;
+    const { error } = await supabase.from("games").update({
+      name: editName.trim(),
+      description: editDesc.trim() || null,
+      image_url: editImage.trim() || null,
+    }).eq("id", editingGameId);
+    if (error) { toast.error("Failed to update game"); return; }
+    setEditingGameId(null);
+    toast.success("Game updated!");
+    refetchGames();
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
@@ -279,21 +305,45 @@ const AdminDashboard = () => {
             <div className="grid gap-3">
               {games.map(game => (
                 <div key={game.id} className="flex items-center gap-4 bg-card rounded-lg p-4 ring-1 ring-border">
-                  <img src={getGameImage(game.image_url)} alt={game.name} className="w-16 h-16 rounded-md object-cover" />
-                  <div className="flex-1">
-                    <h3 className="font-heading text-xl text-foreground">{game.name}</h3>
-                    <p className="text-muted-foreground text-sm">{game.description}</p>
+                  <img src={getGameImage(editingGameId === game.id ? editImage : game.image_url)} alt={game.name} className="w-16 h-16 rounded-md object-cover" />
+                  {editingGameId === game.id ? (
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <input value={editName} onChange={e => setEditName(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Name" />
+                      <input value={editDesc} onChange={e => setEditDesc(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Description" />
+                      <select value={editImage} onChange={e => setEditImage(e.target.value)} className="px-3 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">No image</option>
+                        <option value="cricket">Cricket</option>
+                        <option value="badminton">Badminton</option>
+                        <option value="chess">Chess</option>
+                        <option value="carrom">Carrom</option>
+                        <option value="table-tennis">Table Tennis</option>
+                        <option value="tug-of-war">Tug of War</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="flex-1">
+                      <h3 className="font-heading text-xl text-foreground">{game.name}</h3>
+                      <p className="text-muted-foreground text-sm">{game.description}</p>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    {editingGameId === game.id ? (
+                      <>
+                        <button onClick={handleSaveGame} className="p-2 rounded-md bg-primary text-primary-foreground hover:opacity-90"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingGameId(null)} className="p-2 rounded-md bg-muted text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+                      </>
+                    ) : (
+                      <button onClick={() => startEditing(game)} className="p-2 rounded-md text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                    )}
+                    <button
+                      onClick={() => handleToggleGame(game)}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        game.is_active ? "bg-secondary/20 text-secondary" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {game.is_active ? "Active" : "Inactive"}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleToggleGame(game)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      game.is_active
-                        ? "bg-secondary/20 text-secondary"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {game.is_active ? "Active" : "Inactive"}
-                  </button>
                 </div>
               ))}
             </div>
