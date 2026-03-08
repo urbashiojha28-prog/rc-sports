@@ -150,6 +150,26 @@ const AdminDashboard = () => {
     toast.success("Registration deleted");
   };
 
+  const startEditing = (game: Game) => {
+    setEditingGameId(game.id);
+    setEditName(game.name);
+    setEditDesc(game.description || "");
+    setEditImage(game.image_url || "");
+  };
+
+  const handleSaveGame = async () => {
+    if (!editingGameId || !editName.trim()) return;
+    const { error } = await supabase.from("games").update({
+      name: editName.trim(),
+      description: editDesc.trim() || null,
+      image_url: editImage.trim() || null,
+    }).eq("id", editingGameId);
+    if (error) { toast.error("Failed to update game"); return; }
+    setEditingGameId(null);
+    toast.success("Game updated!");
+    refetchGames();
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
 
   return (
