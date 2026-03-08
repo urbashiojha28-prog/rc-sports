@@ -312,10 +312,10 @@ const AdminDashboard = () => {
                   ))}
                 </select>
                 <button
-                  onClick={handleExportCSV}
+                  onClick={handleExportExcel}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  <Download className="w-4 h-4" /> Export CSV
+                  <Download className="w-4 h-4" /> Export Excel
                 </button>
               </div>
             </div>
