@@ -1,36 +1,37 @@
 // Maps class + gender to allowed game names
+// IMPORTANT: Names must exactly match the game names in the database
 type GameMapping = Record<string, string[]>;
 
 const boysMapping: GameMapping = {
-  "1st": ["100 Meter Running", "Drawing Competition"],
-  "2nd": ["100 Meter Running", "Drawing Competition"],
-  "3rd": ["100 Meter Running", "Drawing Competition"],
-  "4th": ["100 Meter Running", "Drawing Competition"],
-  "5th": ["100 Meter Running", "Long Jump", "Drawing Competition"],
-  "6th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "7th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "8th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "9th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "10th": ["100 Meter Running", "Long Jump", "Kho Kho"],
-  "11th": ["Long Jump", "Kho Kho"],
-  "12th": ["Long Jump", "Kho Kho"],
+  "1st": ["100 Meter Race", "Drawing Competition"],
+  "2nd": ["100 Meter Race", "Drawing Competition"],
+  "3rd": ["100 Meter Race", "Drawing Competition"],
+  "4th": ["100 Meter Race", "Drawing Competition"],
+  "5th": ["100 Meter Race", "Long Jump", "Drawing Competition"],
+  "6th": ["100 Meter Race", "Long Jump", "Kho Kho(class 5-12 only)"],
+  "7th": ["100 Meter Race", "Long Jump", "Kho Kho(class 5-12 only)"],
+  "8th": ["100 Meter Race", "Long Jump", "Kho Kho(class 5-12 only)"],
+  "9th": ["100 Meter Race", "Long Jump", "Kho Kho(class 5-12 only)"],
+  "10th": ["100 Meter Race", "Long Jump", "Kho Kho(class 5-12 only)"],
+  "11th": ["Long Jump", "Kho Kho(class 5-12 only)"],
+  "12th": ["Long Jump", "Kho Kho(class 5-12 only)"],
   "Senior": ["Long Jump", "Volleyball"],
 };
 
 const girlsMapping: GameMapping = {
-  "1st": ["100 Meter Running", "Drawing Competition"],
-  "2nd": ["100 Meter Running", "Drawing Competition"],
-  "3rd": ["100 Meter Running", "Drawing Competition"],
-  "4th": ["100 Meter Running", "Drawing Competition"],
-  "5th": ["100 Meter Running", "Long Jump", "Drawing Competition"],
-  "6th": ["100 Meter Running", "Long Jump", "Spoon With Lemon Race", "Kho Kho"],
-  "7th": ["100 Meter Running", "Long Jump", "Spoon With Lemon Race", "Kho Kho"],
-  "8th": ["100 Meter Running", "Long Jump", "Spoon With Lemon Race", "Kho Kho"],
-  "9th": ["100 Meter Running", "Long Jump", "Spoon With Lemon Race", "Kho Kho"],
-  "10th": ["100 Meter Running", "Long Jump", "Spoon With Lemon Race", "Kho Kho"],
-  "11th": ["Long Jump", "Kho Kho"],
-  "12th": ["Long Jump", "Kho Kho"],
-  "Senior": ["Musical Chair"],
+  "1st": ["100 Meter Race", "Drawing Competition"],
+  "2nd": ["100 Meter Race", "Drawing Competition"],
+  "3rd": ["100 Meter Race", "Drawing Competition"],
+  "4th": ["100 Meter Race", "Drawing Competition"],
+  "5th": ["100 Meter Race", "Long Jump", "Drawing Competition"],
+  "6th": ["100 Meter Race", "Long Jump", "Spoon with Lemon Race", "Kho Kho(class 5-12 only)"],
+  "7th": ["100 Meter Race", "Long Jump", "Spoon with Lemon Race", "Kho Kho(class 5-12 only)"],
+  "8th": ["100 Meter Race", "Long Jump", "Spoon with Lemon Race", "Kho Kho(class 5-12 only)"],
+  "9th": ["100 Meter Race", "Long Jump", "Spoon with Lemon Race", "Kho Kho(class 5-12 only)"],
+  "10th": ["100 Meter Race", "Long Jump", "Spoon with Lemon Race", "Kho Kho(class 5-12 only)"],
+  "11th": ["Long Jump", "Kho Kho(class 5-12 only)"],
+  "12th": ["Long Jump", "Kho Kho(class 5-12 only)"],
+  "Senior": ["Musical Chair (Only Married Ladies)"],
 };
 
 export const getAvailableGameNames = (studentClass: string, gender: string): string[] => {
@@ -43,7 +44,6 @@ export const getAvailableGameNames = (studentClass: string, gender: string): str
   return [...new Set([...boys, ...girls])];
 };
 
-// Get all unique class groups for admin filtering
 export const classGroups = [
   "1st", "2nd", "3rd", "4th", "5th", "6th",
   "7th", "8th", "9th", "10th", "11th", "12th", "Senior",
@@ -51,7 +51,6 @@ export const classGroups = [
 
 export const genderOptions = ["Male", "Female"];
 
-// Get all unique game names across all mappings
 export const getAllGameNames = (): string[] => {
   const all = new Set<string>();
   Object.values(boysMapping).forEach(games => games.forEach(g => all.add(g)));
