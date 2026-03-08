@@ -122,7 +122,14 @@ const RegistrationPage = () => {
           gender: gender,
         });
 
-      if (regError) throw regError;
+      if (regError) {
+        if (regError.code === '23505' || regError.message?.includes('duplicate') || regError.message?.includes('unique')) {
+          toast.error("This contact number is already registered! Each person can only register once.");
+          setSubmitting(false);
+          return;
+        }
+        throw regError;
+      }
 
       const gameInserts = selectedGames.map((gameId) => ({
         registration_id: registrationId,

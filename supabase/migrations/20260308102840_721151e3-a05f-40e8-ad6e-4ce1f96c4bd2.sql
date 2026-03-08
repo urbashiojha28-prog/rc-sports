@@ -1,0 +1,1 @@
+ALTER TABLE public.registrations ADD CONSTRAINT registrations_contact_number_unique UNIQUE (contact_number);
