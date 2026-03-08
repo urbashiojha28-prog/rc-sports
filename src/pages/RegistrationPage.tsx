@@ -343,7 +343,6 @@ const RegistrationPage = () => {
                       <option value="Senior">Senior</option>
                     </select>
                   </div>
-                  </div>
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Gender
