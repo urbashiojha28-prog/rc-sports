@@ -124,7 +124,7 @@ const RegistrationPage = () => {
 
       if (regError) {
         if (regError.code === '23505' || regError.message?.includes('duplicate') || regError.message?.includes('unique')) {
-          toast.error("This name is already registered! Each person can only register once.");
+          toast.error("This person is already registered! Each person can only register once.");
           setSubmitting(false);
           return;
         }
