@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image } from "lucide-react";
+import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image, Download, Filter } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
 
 interface Registration {
@@ -29,6 +29,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
+  const [gameFilter, setGameFilter] = useState<string>("all");
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -201,6 +202,33 @@ const AdminDashboard = () => {
     refetchGames();
   };
 
+  const filteredRegistrations = gameFilter === "all"
+    ? registrations
+    : registrations.filter(r => r.games.includes(gameFilter));
+
+  const handleExportCSV = () => {
+    const data = filteredRegistrations;
+    if (data.length === 0) { toast.error("No data to export"); return; }
+    const headers = ["Name", "Tower", "Flat", "Contact", "Games", "Date"];
+    const rows = data.map(r => [
+      r.participant_name,
+      r.tower,
+      r.flat_no,
+      r.contact_number,
+      r.games.join("; "),
+      new Date(r.created_at).toLocaleDateString(),
+    ]);
+    const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `registrations${gameFilter !== "all" ? `-${gameFilter}` : ""}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV downloaded!");
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
 
   return (
@@ -240,13 +268,36 @@ const AdminDashboard = () => {
         {/* Registrations Tab */}
         {activeTab === "registrations" && (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <h2 className="font-heading text-2xl text-foreground">
-                Registrations ({registrations.length})
+                Registrations ({filteredRegistrations.length})
               </h2>
+              <div className="flex gap-2 flex-wrap">
+                {/* Game Filter */}
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <select
+                    value={gameFilter}
+                    onChange={(e) => setGameFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="all">All Games</option>
+                    {games.map(g => (
+                      <option key={g.id} value={g.name}>{g.name}</option>
+                    ))}
+                  </select>
+                </div>
+                {/* CSV Export */}
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Export CSV
+                </button>
+              </div>
             </div>
-            {registrations.length === 0 ? (
-              <p className="text-muted-foreground">No registrations yet.</p>
+            {filteredRegistrations.length === 0 ? (
+              <p className="text-muted-foreground">No registrations{gameFilter !== "all" ? ` for ${gameFilter}` : ""} yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -262,7 +313,7 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {registrations.map(reg => (
+                    {filteredRegistrations.map(reg => (
                       <tr key={reg.id} className="border-b border-border hover:bg-muted/50">
                         <td className="py-3 px-4 text-foreground">{reg.participant_name}</td>
                         <td className="py-3 px-4 text-foreground">{reg.tower}</td>
