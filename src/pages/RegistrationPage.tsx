@@ -89,11 +89,6 @@ const RegistrationPage = () => {
     })();
   };
 
-  const handleWhatsAppShare = () => {
-    const url = window.location.href;
-    const text = `🏆 ${siteTitle}\n${siteSubtitle}\n\nRegister here: ${url}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
