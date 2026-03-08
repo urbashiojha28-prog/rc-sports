@@ -1,0 +1,347 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save } from "lucide-react";
+import { getGameImage } from "@/lib/gameImages";
+
+interface Registration {
+  id: string;
+  participant_name: string;
+  tower: string;
+  flat_no: string;
+  contact_number: string;
+  created_at: string;
+  games: string[];
+}
+
+interface Game {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  display_order: number;
+}
+
+const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Settings state
+  const [siteTitle, setSiteTitle] = useState("");
+  const [siteSubtitle, setSiteSubtitle] = useState("");
+  const [registrationOpen, setRegistrationOpen] = useState(true);
+
+  // New game state
+  const [newGameName, setNewGameName] = useState("");
+  const [newGameDesc, setNewGameDesc] = useState("");
+  const [newGameImage, setNewGameImage] = useState("");
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate("/admin"); return; }
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+      if (!roles || !roles.some(r => r.role === "admin")) { navigate("/admin"); return; }
+      setIsAdmin(true);
+      setLoading(false);
+    };
+    checkAdmin();
+  }, [navigate]);
+
+  const { data: registrations = [] } = useQuery({
+    queryKey: ["admin_registrations"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data: regs, error } = await supabase.from("registrations").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+
+      const { data: regGames } = await supabase.from("registration_games").select("registration_id, game_id");
+      const { data: allGames } = await supabase.from("games").select("id, name");
+
+      const gameMap = new Map(allGames?.map(g => [g.id, g.name]) || []);
+
+      return regs.map(r => ({
+        ...r,
+        games: (regGames || [])
+          .filter(rg => rg.registration_id === r.id)
+          .map(rg => gameMap.get(rg.game_id) || "Unknown"),
+      })) as Registration[];
+    },
+  });
+
+  const { data: games = [], refetch: refetchGames } = useQuery({
+    queryKey: ["admin_games"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      // Admin can see all games including inactive - use a direct query
+      const { data, error } = await supabase.from("games").select("*").order("display_order");
+      if (error) throw error;
+      return data as Game[];
+    },
+  });
+
+  const { data: settings } = useQuery({
+    queryKey: ["admin_settings"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("*");
+      const map: Record<string, string> = {};
+      data?.forEach((s: { key: string; value: string }) => { map[s.key] = s.value; });
+      setSiteTitle(map.site_title || "");
+      setSiteSubtitle(map.site_subtitle || "");
+      setRegistrationOpen(map.registration_open !== "false");
+      return map;
+    },
+  });
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin");
+  };
+
+  const handleSaveSettings = async () => {
+    const updates = [
+      { key: "site_title", value: siteTitle },
+      { key: "site_subtitle", value: siteSubtitle },
+      { key: "registration_open", value: registrationOpen ? "true" : "false" },
+    ];
+    for (const u of updates) {
+      await supabase.from("site_settings").update({ value: u.value }).eq("key", u.key);
+    }
+    toast.success("Settings saved!");
+    queryClient.invalidateQueries({ queryKey: ["admin_settings"] });
+  };
+
+  const handleAddGame = async () => {
+    if (!newGameName.trim()) { toast.error("Game name is required"); return; }
+    const maxOrder = Math.max(0, ...games.map(g => g.display_order));
+    const { error } = await supabase.from("games").insert({
+      name: newGameName.trim(),
+      description: newGameDesc.trim() || null,
+      image_url: newGameImage.trim() || null,
+      display_order: maxOrder + 1,
+    });
+    if (error) { toast.error("Failed to add game"); return; }
+    setNewGameName(""); setNewGameDesc(""); setNewGameImage("");
+    toast.success("Game added!");
+    refetchGames();
+  };
+
+  const handleToggleGame = async (game: Game) => {
+    await supabase.from("games").update({ is_active: !game.is_active }).eq("id", game.id);
+    refetchGames();
+  };
+
+  const handleDeleteRegistration = async (id: string) => {
+    await supabase.from("registrations").delete().eq("id", id);
+    queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
+    toast.success("Registration deleted");
+  };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground">Loading...</p></div>;
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="font-heading text-3xl text-foreground">Admin Panel</h1>
+          <button onClick={handleLogout} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            <LogOut className="w-4 h-4" /> Logout
+          </button>
+        </div>
+      </header>
+
+      {/* Tabs */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex gap-2 mb-6">
+          {[
+            { key: "registrations" as const, icon: Users, label: "Registrations" },
+            { key: "games" as const, icon: Gamepad2, label: "Games" },
+            { key: "settings" as const, icon: Settings, label: "Settings" },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors ${
+                activeTab === tab.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" /> {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Registrations Tab */}
+        {activeTab === "registrations" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-2xl text-foreground">
+                Registrations ({registrations.length})
+              </h2>
+            </div>
+            {registrations.length === 0 ? (
+              <p className="text-muted-foreground">No registrations yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Name</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Tower</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Flat</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Contact</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
+                      <th className="py-3 px-4"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {registrations.map(reg => (
+                      <tr key={reg.id} className="border-b border-border hover:bg-muted/50">
+                        <td className="py-3 px-4 text-foreground">{reg.participant_name}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.tower}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.flat_no}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.contact_number}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-1 flex-wrap">
+                            {reg.games.map(g => (
+                              <span key={g} className="bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">{g}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-muted-foreground">{new Date(reg.created_at).toLocaleDateString()}</td>
+                        <td className="py-3 px-4">
+                          <button onClick={() => handleDeleteRegistration(reg.id)} className="text-destructive hover:text-destructive/80">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Games Tab */}
+        {activeTab === "games" && (
+          <div>
+            <h2 className="font-heading text-2xl text-foreground mb-4">Manage Games</h2>
+
+            {/* Add Game */}
+            <div className="bg-card rounded-lg p-4 ring-1 ring-border mb-6">
+              <h3 className="font-heading text-xl text-foreground mb-3">Add New Game</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  value={newGameName}
+                  onChange={(e) => setNewGameName(e.target.value)}
+                  className="px-4 py-2 rounded-md bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Game name"
+                />
+                <input
+                  value={newGameDesc}
+                  onChange={(e) => setNewGameDesc(e.target.value)}
+                  className="px-4 py-2 rounded-md bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Description"
+                />
+                <div className="flex gap-2">
+                  <select
+                    value={newGameImage}
+                    onChange={(e) => setNewGameImage(e.target.value)}
+                    className="flex-1 px-4 py-2 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="">Select image</option>
+                    <option value="cricket">Cricket</option>
+                    <option value="badminton">Badminton</option>
+                    <option value="chess">Chess</option>
+                    <option value="carrom">Carrom</option>
+                    <option value="table-tennis">Table Tennis</option>
+                    <option value="tug-of-war">Tug of War</option>
+                  </select>
+                  <button onClick={handleAddGame} className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Game List */}
+            <div className="grid gap-3">
+              {games.map(game => (
+                <div key={game.id} className="flex items-center gap-4 bg-card rounded-lg p-4 ring-1 ring-border">
+                  <img src={getGameImage(game.image_url)} alt={game.name} className="w-16 h-16 rounded-md object-cover" />
+                  <div className="flex-1">
+                    <h3 className="font-heading text-xl text-foreground">{game.name}</h3>
+                    <p className="text-muted-foreground text-sm">{game.description}</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggleGame(game)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      game.is_active
+                        ? "bg-secondary/20 text-secondary"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {game.is_active ? "Active" : "Inactive"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === "settings" && (
+          <div className="max-w-lg">
+            <h2 className="font-heading text-2xl text-foreground mb-4">Site Settings</h2>
+            <div className="bg-card rounded-lg p-6 ring-1 ring-border space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Site Title</label>
+                <input
+                  value={siteTitle}
+                  onChange={(e) => setSiteTitle(e.target.value)}
+                  className="w-full px-4 py-3 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Subtitle</label>
+                <input
+                  value={siteSubtitle}
+                  onChange={(e) => setSiteSubtitle(e.target.value)}
+                  className="w-full px-4 py-3 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
+                <button
+                  onClick={() => setRegistrationOpen(!registrationOpen)}
+                  className={`w-12 h-6 rounded-full transition-colors ${registrationOpen ? "bg-primary" : "bg-muted"}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-foreground transition-transform ${registrationOpen ? "translate-x-6" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+              <button
+                onClick={handleSaveSettings}
+                className="flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground font-heading text-lg hover:opacity-90 transition-opacity"
+              >
+                <Save className="w-4 h-4" /> Save Settings
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
