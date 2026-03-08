@@ -42,6 +42,12 @@ const AdminDashboard = () => {
   const [newGameDesc, setNewGameDesc] = useState("");
   const [newGameImage, setNewGameImage] = useState("");
 
+  // Editing game state
+  const [editingGameId, setEditingGameId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [editImage, setEditImage] = useState("");
+
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
