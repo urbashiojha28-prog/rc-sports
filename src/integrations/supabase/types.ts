@@ -14,16 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      games: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      registration_games: {
+        Row: {
+          game_id: string
+          id: string
+          registration_id: string
+        }
+        Insert: {
+          game_id: string
+          id?: string
+          registration_id: string
+        }
+        Update: {
+          game_id?: string
+          id?: string
+          registration_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_games_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registrations: {
+        Row: {
+          contact_number: string
+          created_at: string
+          flat_no: string
+          id: string
+          participant_name: string
+          tower: string
+        }
+        Insert: {
+          contact_number: string
+          created_at?: string
+          flat_no: string
+          id?: string
+          participant_name: string
+          tower: string
+        }
+        Update: {
+          contact_number?: string
+          created_at?: string
+          flat_no?: string
+          id?: string
+          participant_name?: string
+          tower?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +284,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const
