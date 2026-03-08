@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getGameImage } from "@/lib/gameImages";
-import { CheckCircle2, Share2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import heroBanner from "@/assets/hero-banner.jpg";
