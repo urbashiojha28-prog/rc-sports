@@ -417,6 +417,29 @@ const AdminDashboard = () => {
                   className="w-full px-4 py-3 rounded-md bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Hero Background Image</label>
+                <div className="flex gap-2 items-center">
+                  {heroImage && (
+                    <img src={heroImage} alt="Hero preview" className="w-16 h-10 rounded object-cover ring-1 ring-border" />
+                  )}
+                  <label className="cursor-pointer flex-1 px-4 py-3 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    <span>{uploading ? "Uploading..." : heroImage ? "Change Image" : "Upload Image"}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = await uploadImage(file);
+                      if (url) setHeroImage(url);
+                    }} disabled={uploading} />
+                  </label>
+                  {heroImage && (
+                    <button onClick={() => setHeroImage("")} className="p-2 rounded-md text-destructive hover:text-destructive/80">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">This image appears behind the title on the homepage. Click Save to apply.</p>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
                 <button
