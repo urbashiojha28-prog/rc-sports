@@ -179,67 +179,80 @@ const RegistrationPage = () => {
       ) : (
         <div className="pb-16">
           {step === "details" && (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{
-              background: 'linear-gradient(135deg, hsl(28 100% 20%), hsl(220 25% 8%), hsl(28 80% 15%))'
-            }}>
-              <div className="w-full max-w-4xl flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl" ref={formRef}>
-                {/* Left: Glassmorphism Form */}
-                <div className="flex-1 p-6 sm:p-8 md:p-10" style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-                }}>
-                  <h2 className="font-heading text-3xl sm:text-4xl text-foreground mb-1 text-center">
-                    {siteTitle}
+            <div
+              className="min-h-screen flex items-center justify-center p-4 md:p-8"
+              style={{
+                background: 'linear-gradient(135deg, hsl(28 80% 30%), hsl(20 60% 15%), hsl(28 90% 25%))',
+              }}
+            >
+              <div
+                className="w-full max-w-[900px] grid grid-cols-1 md:grid-cols-[1fr_340px] rounded-3xl overflow-hidden"
+                ref={formRef}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5)',
+                }}
+              >
+                {/* Left: Form */}
+                <div className="p-8 sm:p-10 md:p-12 flex flex-col justify-center">
+                  <h2
+                    className="font-heading text-4xl sm:text-5xl mb-8 text-center"
+                    style={{ color: 'hsl(28, 100%, 55%)' }}
+                  >
+                    Register Now
                   </h2>
-                  <p className="text-muted-foreground text-sm text-center mb-6">{siteSubtitle}</p>
 
-                  <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                  <form onSubmit={handleDetailsSubmit} className="space-y-6">
+                    {/* Full Name */}
                     <div className="relative">
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                        className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
                         placeholder="Full Name"
                         maxLength={100}
                         required
                       />
-                      <User className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                      <User className="absolute right-1 top-3.5 w-5 h-5 text-muted-foreground" />
                     </div>
 
+                    {/* Contact */}
                     <div className="relative">
                       <input
                         type="tel"
                         value={contact}
                         onChange={(e) => setContact(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                        className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                        placeholder="Contact Number (10 digits)"
+                        className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
+                        placeholder="Contact Number"
                         required
                       />
-                      <Phone className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                      <Phone className="absolute right-1 top-3.5 w-5 h-5 text-muted-foreground" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Tower & Flat */}
+                    <div className="grid grid-cols-2 gap-6">
                       <div className="relative">
                         <input
                           type="text"
                           value={tower}
                           onChange={(e) => setTower(e.target.value)}
-                          className="w-full px-4 py-3 pr-10 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                          className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
                           placeholder="Tower"
                           maxLength={50}
                           required
                         />
-                        <Home className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                        <Home className="absolute right-1 top-3.5 w-5 h-5 text-muted-foreground" />
                       </div>
-                      <div className="relative">
+                      <div>
                         <input
                           type="text"
                           value={flatNo}
                           onChange={(e) => setFlatNo(e.target.value)}
-                          className="w-full px-4 py-3 bg-transparent border-b-2 border-muted-foreground/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                          className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-base"
                           placeholder="Flat No"
                           maxLength={20}
                           required
@@ -247,52 +260,57 @@ const RegistrationPage = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Class & Gender */}
+                    <div className="grid grid-cols-2 gap-6">
                       <div className="relative">
                         <select
                           value={studentClass}
                           onChange={(e) => setStudentClass(e.target.value)}
-                          className="w-full px-4 py-3 pr-8 bg-transparent border-b-2 border-muted-foreground/30 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none"
+                          className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none text-base cursor-pointer"
                           required
                         >
-                          <option value="" className="bg-card">Class</option>
+                          <option value="" className="bg-card text-foreground">Class</option>
                           {["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","Senior"].map(c => (
-                            <option key={c} value={c} className="bg-card">{c}</option>
+                            <option key={c} value={c} className="bg-card text-foreground">{c}</option>
                           ))}
                         </select>
-                        <GraduationCap className="absolute right-3 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <GraduationCap className="absolute right-1 top-3.5 w-5 h-5 text-muted-foreground pointer-events-none" />
                       </div>
                       <div>
                         <select
                           value={gender}
                           onChange={(e) => setGender(e.target.value)}
-                          className="w-full px-4 py-3 bg-transparent border-b-2 border-muted-foreground/30 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none"
+                          className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none text-base cursor-pointer"
                           required
                         >
-                          <option value="" className="bg-card">Gender</option>
-                          <option value="Male" className="bg-card">Male</option>
-                          <option value="Female" className="bg-card">Female</option>
-                          <option value="Other" className="bg-card">Other</option>
+                          <option value="" className="bg-card text-foreground">Gender</option>
+                          <option value="Male" className="bg-card text-foreground">Male</option>
+                          <option value="Female" className="bg-card text-foreground">Female</option>
+                          <option value="Other" className="bg-card text-foreground">Other</option>
                         </select>
                       </div>
                     </div>
 
+                    {/* Submit Button */}
                     <button
                       type="submit"
-                      className="w-full py-3.5 mt-2 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-heading text-xl tracking-wider hover:opacity-90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                      style={{ boxShadow: '0 4px 20px hsl(28 100% 55% / 0.4)' }}
+                      className="w-full py-4 rounded-full font-heading text-xl tracking-wider text-primary-foreground transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: 'linear-gradient(135deg, hsl(28, 100%, 40%), hsl(20, 80%, 20%))',
+                        boxShadow: '0 8px 25px hsl(28 100% 30% / 0.5)',
+                      }}
                     >
                       Next: Choose Games →
                     </button>
                   </form>
                 </div>
 
-                {/* Right: Illustration */}
-                <div className="hidden md:block w-[320px] lg:w-[380px] relative overflow-hidden rounded-r-2xl">
+                {/* Right: Image (exact copy from reference) */}
+                <div className="hidden md:block relative p-4">
                   <img
                     src={sportsIllustration}
-                    alt="Sports Championship"
-                    className="w-full h-full object-cover"
+                    alt="Registration"
+                    className="w-full h-full object-cover rounded-2xl"
                   />
                 </div>
               </div>
