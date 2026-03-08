@@ -20,6 +20,8 @@ const RegistrationPage = () => {
   const [tower, setTower] = useState("");
   const [flatNo, setFlatNo] = useState("");
   const [contact, setContact] = useState("");
+  const [studentClass, setStudentClass] = useState("");
+  const [gender, setGender] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
