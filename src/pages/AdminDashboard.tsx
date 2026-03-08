@@ -241,13 +241,36 @@ const AdminDashboard = () => {
         {/* Registrations Tab */}
         {activeTab === "registrations" && (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <h2 className="font-heading text-2xl text-foreground">
-                Registrations ({registrations.length})
+                Registrations ({filteredRegistrations.length})
               </h2>
+              <div className="flex gap-2 flex-wrap">
+                {/* Game Filter */}
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <select
+                    value={gameFilter}
+                    onChange={(e) => setGameFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="all">All Games</option>
+                    {games.map(g => (
+                      <option key={g.id} value={g.name}>{g.name}</option>
+                    ))}
+                  </select>
+                </div>
+                {/* CSV Export */}
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground text-sm transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Export CSV
+                </button>
+              </div>
             </div>
-            {registrations.length === 0 ? (
-              <p className="text-muted-foreground">No registrations yet.</p>
+            {filteredRegistrations.length === 0 ? (
+              <p className="text-muted-foreground">No registrations{gameFilter !== "all" ? ` for ${gameFilter}` : ""} yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -263,7 +286,7 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {registrations.map(reg => (
+                    {filteredRegistrations.map(reg => (
                       <tr key={reg.id} className="border-b border-border hover:bg-muted/50">
                         <td className="py-3 px-4 text-foreground">{reg.participant_name}</td>
                         <td className="py-3 px-4 text-foreground">{reg.tower}</td>
