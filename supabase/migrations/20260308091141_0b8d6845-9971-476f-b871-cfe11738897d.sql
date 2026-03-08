@@ -1,0 +1,1 @@
+ALTER TABLE public.registrations ADD COLUMN class text, ADD COLUMN gender text;

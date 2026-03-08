@@ -79,25 +79,31 @@ export type Database = {
       }
       registrations: {
         Row: {
+          class: string | null
           contact_number: string
           created_at: string
           flat_no: string
+          gender: string | null
           id: string
           participant_name: string
           tower: string
         }
         Insert: {
+          class?: string | null
           contact_number: string
           created_at?: string
           flat_no: string
+          gender?: string | null
           id?: string
           participant_name: string
           tower: string
         }
         Update: {
+          class?: string | null
           contact_number?: string
           created_at?: string
           flat_no?: string
+          gender?: string | null
           id?: string
           participant_name?: string
           tower?: string
