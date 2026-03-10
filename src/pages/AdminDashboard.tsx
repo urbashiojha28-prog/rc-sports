@@ -564,6 +564,7 @@ const AdminDashboard = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Upload your UPI QR code. It will be shown to users after registration. Click Save to apply.</p>
+              </div>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
                 <button
