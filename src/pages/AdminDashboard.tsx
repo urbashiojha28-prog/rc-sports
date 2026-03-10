@@ -187,6 +187,14 @@ const AdminDashboard = () => {
     toast.success("Registration deleted");
   };
 
+  const handleTogglePayment = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "paid" ? "pending" : "paid";
+    const { error } = await supabase.from("registrations").update({ payment_status: newStatus } as any).eq("id", id);
+    if (error) { toast.error("Failed to update payment status"); return; }
+    queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
+    toast.success(`Payment marked as ${newStatus}`);
+  };
+
   const startEditing = (game: Game) => {
     setEditingGameId(game.id);
     setEditName(game.name);
