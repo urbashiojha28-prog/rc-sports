@@ -1,0 +1,1 @@
+ALTER TABLE public.registrations ADD COLUMN payment_status text NOT NULL DEFAULT 'pending';

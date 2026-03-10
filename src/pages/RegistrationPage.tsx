@@ -153,15 +153,36 @@ const RegistrationPage = () => {
     }
   };
 
+  const upiQrUrl = settings?.upi_qr_url;
+
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="text-center animate-fade-in-up">
+        <div className="text-center animate-fade-in-up max-w-md mx-auto">
           <CheckCircle2 className="w-20 h-20 text-secondary mx-auto mb-6" />
           <h1 className="font-heading text-5xl text-foreground mb-4">You're In!</h1>
-          <p className="text-muted-foreground text-lg max-w-md mx-auto">
-            Your registration has been submitted successfully. Get ready to compete! 🏆
+          <p className="text-muted-foreground text-lg mb-8">
+            Your registration has been submitted successfully. 🏆
           </p>
+
+          {upiQrUrl && (
+            <div className="bg-card rounded-2xl p-6 ring-1 ring-border shadow-lg">
+              <h2 className="font-heading text-2xl text-foreground mb-2">Complete Payment</h2>
+              <p className="text-muted-foreground text-sm mb-4">
+                Scan the QR code below to pay the registration fee via UPI
+              </p>
+              <div className="bg-white rounded-xl p-4 inline-block mb-4">
+                <img
+                  src={upiQrUrl}
+                  alt="UPI QR Code"
+                  className="w-48 h-48 object-contain mx-auto"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                After payment, your registration will be confirmed by the admin.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );

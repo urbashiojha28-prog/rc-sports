@@ -17,6 +17,7 @@ interface Registration {
   gender: string | null;
   created_at: string;
   games: string[];
+  payment_status: string;
 }
 
 interface Game {
@@ -43,6 +44,7 @@ const AdminDashboard = () => {
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [registrationOpen, setRegistrationOpen] = useState(true);
   const [heroImage, setHeroImage] = useState("");
+  const [upiQrUrl, setUpiQrUrl] = useState("");
 
   // New game state
   const [newGameName, setNewGameName] = useState("");
@@ -134,6 +136,7 @@ const AdminDashboard = () => {
       setSiteSubtitle(map.site_subtitle || "");
       setRegistrationOpen(map.registration_open !== "false");
       setHeroImage(map.hero_image || "");
+      setUpiQrUrl(map.upi_qr_url || "");
       return map;
     },
   });
@@ -149,6 +152,7 @@ const AdminDashboard = () => {
       { key: "site_subtitle", value: siteSubtitle },
       { key: "registration_open", value: registrationOpen ? "true" : "false" },
       { key: "hero_image", value: heroImage },
+      { key: "upi_qr_url", value: upiQrUrl },
     ];
     for (const u of updates) {
       await supabase.from("site_settings").update({ value: u.value }).eq("key", u.key);
@@ -181,6 +185,14 @@ const AdminDashboard = () => {
     await supabase.from("registrations").delete().eq("id", id);
     queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
     toast.success("Registration deleted");
+  };
+
+  const handleTogglePayment = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "paid" ? "pending" : "paid";
+    const { error } = await supabase.from("registrations").update({ payment_status: newStatus } as any).eq("id", id);
+    if (error) { toast.error("Failed to update payment status"); return; }
+    queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
+    toast.success(`Payment marked as ${newStatus}`);
   };
 
   const startEditing = (game: Game) => {
@@ -225,6 +237,7 @@ const AdminDashboard = () => {
       Class: r.class || '',
       Gender: r.gender || '',
       Games: r.games.join("; "),
+      Payment: r.payment_status === "paid" ? "Paid" : "Pending",
       Date: new Date(r.created_at).toLocaleDateString(),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -334,6 +347,7 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Gender</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Payment</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>
@@ -354,6 +368,18 @@ const AdminDashboard = () => {
                           </div>
                         </td>
                         <td className="py-3 px-4 text-muted-foreground">{new Date(reg.created_at).toLocaleDateString()}</td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => handleTogglePayment(reg.id, reg.payment_status)}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                              reg.payment_status === "paid"
+                                ? "bg-secondary/20 text-secondary"
+                                : "bg-destructive/20 text-destructive"
+                            }`}
+                          >
+                            {reg.payment_status === "paid" ? "Paid ✓" : "Pending"}
+                          </button>
+                        </td>
                         <td className="py-3 px-4">
                           <button onClick={() => handleDeleteRegistration(reg.id)} className="text-destructive hover:text-destructive/80">
                             <Trash2 className="w-4 h-4" />
@@ -515,6 +541,30 @@ const AdminDashboard = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">This image appears behind the title on the homepage. Click Save to apply.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">UPI Payment QR Code</label>
+                <div className="flex gap-2 items-center">
+                  {upiQrUrl && (
+                    <img src={upiQrUrl} alt="UPI QR" className="w-16 h-16 rounded object-contain ring-1 ring-border bg-white p-1" />
+                  )}
+                  <label className="cursor-pointer flex-1 px-4 py-3 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    <span>{uploading ? "Uploading..." : upiQrUrl ? "Change QR" : "Upload QR"}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = await uploadImage(file);
+                      if (url) setUpiQrUrl(url);
+                    }} disabled={uploading} />
+                  </label>
+                  {upiQrUrl && (
+                    <button onClick={() => setUpiQrUrl("")} className="p-2 rounded-md text-destructive hover:text-destructive/80">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Upload your UPI QR code. It will be shown to users after registration. Click Save to apply.</p>
               </div>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
