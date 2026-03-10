@@ -86,6 +86,7 @@ export type Database = {
           gender: string | null
           id: string
           participant_name: string
+          payment_status: string
           tower: string
         }
         Insert: {
@@ -96,6 +97,7 @@ export type Database = {
           gender?: string | null
           id?: string
           participant_name: string
+          payment_status?: string
           tower: string
         }
         Update: {
@@ -106,6 +108,7 @@ export type Database = {
           gender?: string | null
           id?: string
           participant_name?: string
+          payment_status?: string
           tower?: string
         }
         Relationships: []
