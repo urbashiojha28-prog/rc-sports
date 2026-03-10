@@ -237,6 +237,7 @@ const AdminDashboard = () => {
       Class: r.class || '',
       Gender: r.gender || '',
       Games: r.games.join("; "),
+      Payment: r.payment_status === "paid" ? "Paid" : "Pending",
       Date: new Date(r.created_at).toLocaleDateString(),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
