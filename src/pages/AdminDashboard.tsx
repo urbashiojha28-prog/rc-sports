@@ -17,6 +17,7 @@ interface Registration {
   gender: string | null;
   created_at: string;
   games: string[];
+  payment_status: string;
 }
 
 interface Game {
