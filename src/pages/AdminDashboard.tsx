@@ -346,6 +346,7 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Gender</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Payment</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>
