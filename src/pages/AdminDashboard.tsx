@@ -541,6 +541,29 @@ const AdminDashboard = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">This image appears behind the title on the homepage. Click Save to apply.</p>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">UPI Payment QR Code</label>
+                <div className="flex gap-2 items-center">
+                  {upiQrUrl && (
+                    <img src={upiQrUrl} alt="UPI QR" className="w-16 h-16 rounded object-contain ring-1 ring-border bg-white p-1" />
+                  )}
+                  <label className="cursor-pointer flex-1 px-4 py-3 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    <span>{uploading ? "Uploading..." : upiQrUrl ? "Change QR" : "Upload QR"}</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const url = await uploadImage(file);
+                      if (url) setUpiQrUrl(url);
+                    }} disabled={uploading} />
+                  </label>
+                  {upiQrUrl && (
+                    <button onClick={() => setUpiQrUrl("")} className="p-2 rounded-md text-destructive hover:text-destructive/80">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Upload your UPI QR code. It will be shown to users after registration. Click Save to apply.</p>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>
                 <button
