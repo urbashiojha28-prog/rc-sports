@@ -368,6 +368,18 @@ const AdminDashboard = () => {
                         </td>
                         <td className="py-3 px-4 text-muted-foreground">{new Date(reg.created_at).toLocaleDateString()}</td>
                         <td className="py-3 px-4">
+                          <button
+                            onClick={() => handleTogglePayment(reg.id, reg.payment_status)}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                              reg.payment_status === "paid"
+                                ? "bg-secondary/20 text-secondary"
+                                : "bg-destructive/20 text-destructive"
+                            }`}
+                          >
+                            {reg.payment_status === "paid" ? "Paid ✓" : "Pending"}
+                          </button>
+                        </td>
+                        <td className="py-3 px-4">
                           <button onClick={() => handleDeleteRegistration(reg.id)} className="text-destructive hover:text-destructive/80">
                             <Trash2 className="w-4 h-4" />
                           </button>
