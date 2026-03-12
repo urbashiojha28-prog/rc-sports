@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,7 +33,19 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
-  const [classFilter, setClassFilter] = useState<string>("all");
+  const [classFilter, setClassFilter] = useState<string[]>([]);
+  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
+  const classDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (classDropdownRef.current && !classDropdownRef.current.contains(e.target as Node)) {
+        setClassDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [genderFilter, setGenderFilter] = useState<string>("all");
   const [gameFilter, setGameFilter] = useState<string>("all");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -217,7 +229,7 @@ const AdminDashboard = () => {
 
   // Multi-filter registrations
   const filteredRegistrations = registrations.filter(r => {
-    if (classFilter !== "all" && r.class !== classFilter) return false;
+    if (classFilter.length > 0 && (!r.class || !classFilter.includes(r.class))) return false;
     if (genderFilter !== "all" && r.gender !== genderFilter) return false;
     if (gameFilter !== "all" && !r.games.includes(gameFilter)) return false;
     return true;
@@ -243,7 +255,7 @@ const AdminDashboard = () => {
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrations");
-    const filterLabel = [classFilter !== "all" ? classFilter : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
+    const filterLabel = [classFilter.length > 0 ? classFilter.join("+") : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
     XLSX.writeFile(wb, `registrations${filterLabel ? `-${filterLabel}` : ""}.xlsx`);
     toast.success("Excel file downloaded!");
   };
@@ -291,17 +303,40 @@ const AdminDashboard = () => {
               </h2>
               <div className="flex gap-2 flex-wrap items-center">
                 <Filter className="w-4 h-4 text-muted-foreground" />
-                {/* Class Filter */}
-                <select
-                  value={classFilter}
-                  onChange={(e) => setClassFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="all">All Classes</option>
-                  {classGroups.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                {/* Class Filter - Multi-select */}
+                <div className="relative" ref={classDropdownRef}>
+                  <button
+                    onClick={() => setClassDropdownOpen(!classDropdownOpen)}
+                    className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary min-w-[120px] text-left"
+                  >
+                    {classFilter.length === 0 ? "All Classes" : `${classFilter.length} selected`}
+                  </button>
+                  {classDropdownOpen && (
+                    <div className="absolute z-50 mt-1 bg-card border border-border rounded-md shadow-lg p-2 min-w-[160px] max-h-60 overflow-y-auto">
+                      <button
+                        onClick={() => setClassFilter([])}
+                        className="w-full text-left px-2 py-1 text-xs text-muted-foreground hover:text-foreground mb-1"
+                      >
+                        Clear all
+                      </button>
+                      {classGroups.map(c => (
+                        <label key={c} className="flex items-center gap-2 px-2 py-1 hover:bg-muted rounded cursor-pointer text-sm text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={classFilter.includes(c)}
+                            onChange={() => {
+                              setClassFilter(prev =>
+                                prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+                              );
+                            }}
+                            className="accent-primary"
+                          />
+                          {c}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {/* Gender Filter */}
                 <select
                   value={genderFilter}
