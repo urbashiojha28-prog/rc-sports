@@ -218,7 +218,7 @@ const AdminDashboard = () => {
 
   // Multi-filter registrations
   const filteredRegistrations = registrations.filter(r => {
-    if (classFilter !== "all" && r.class !== classFilter) return false;
+    if (classFilter.length > 0 && (!r.class || !classFilter.includes(r.class))) return false;
     if (genderFilter !== "all" && r.gender !== genderFilter) return false;
     if (gameFilter !== "all" && !r.games.includes(gameFilter)) return false;
     return true;
