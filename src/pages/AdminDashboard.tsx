@@ -304,7 +304,7 @@ const AdminDashboard = () => {
               <div className="flex gap-2 flex-wrap items-center">
                 <Filter className="w-4 h-4 text-muted-foreground" />
                 {/* Class Filter - Multi-select */}
-                <div className="relative">
+                <div className="relative" ref={classDropdownRef}>
                   <button
                     onClick={() => setClassDropdownOpen(!classDropdownOpen)}
                     className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary min-w-[120px] text-left"
