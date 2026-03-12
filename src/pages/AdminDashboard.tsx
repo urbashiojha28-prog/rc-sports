@@ -244,7 +244,7 @@ const AdminDashboard = () => {
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrations");
-    const filterLabel = [classFilter !== "all" ? classFilter : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
+    const filterLabel = [classFilter.length > 0 ? classFilter.join("+") : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
     XLSX.writeFile(wb, `registrations${filterLabel ? `-${filterLabel}` : ""}.xlsx`);
     toast.success("Excel file downloaded!");
   };
