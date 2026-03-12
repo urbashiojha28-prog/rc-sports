@@ -33,7 +33,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
-  const [classFilter, setClassFilter] = useState<string>("all");
+  const [classFilter, setClassFilter] = useState<string[]>([]);
+  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
   const [genderFilter, setGenderFilter] = useState<string>("all");
   const [gameFilter, setGameFilter] = useState<string>("all");
   const [isAdmin, setIsAdmin] = useState(false);
