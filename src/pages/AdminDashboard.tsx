@@ -35,6 +35,17 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
   const [classFilter, setClassFilter] = useState<string[]>([]);
   const [classDropdownOpen, setClassDropdownOpen] = useState(false);
+  const classDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (classDropdownRef.current && !classDropdownRef.current.contains(e.target as Node)) {
+        setClassDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [genderFilter, setGenderFilter] = useState<string>("all");
   const [gameFilter, setGameFilter] = useState<string>("all");
   const [isAdmin, setIsAdmin] = useState(false);
