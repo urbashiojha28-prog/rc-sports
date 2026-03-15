@@ -85,6 +85,7 @@ export type Database = {
           flat_no: string
           gender: string | null
           id: string
+          marital_status: string | null
           participant_name: string
           payment_status: string
           tower: string
@@ -96,6 +97,7 @@ export type Database = {
           flat_no: string
           gender?: string | null
           id?: string
+          marital_status?: string | null
           participant_name: string
           payment_status?: string
           tower: string
@@ -107,6 +109,7 @@ export type Database = {
           flat_no?: string
           gender?: string | null
           id?: string
+          marital_status?: string | null
           participant_name?: string
           payment_status?: string
           tower?: string
