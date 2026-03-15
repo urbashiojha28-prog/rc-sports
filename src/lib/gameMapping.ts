@@ -1,5 +1,9 @@
 export type GameMapping = Record<string, string[]>;
 
+// These are the missing exports the Admin Dashboard is looking for:
+export const ageGroups = ["5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18-34", "35 & above"];
+export const genderOptions = ["Male", "Female"];
+
 export const boysMapping: GameMapping = {
   "5": ["100 Meter Race"], "6": ["100 Meter Race"], "7": ["100 Meter Race"],
   "8": ["100 Meter Race", "Slow Cycle", "Chess"], "9": ["100 Meter Race", "Slow Cycle", "Chess"],
