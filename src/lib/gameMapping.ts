@@ -1,6 +1,4 @@
 // Maps age group + gender + marital status to allowed game names
-// IMPORTANT: Names must exactly match the game names in the database
-
 type GameMapping = Record<string, string[]>;
 
 export const boysMapping: GameMapping = {
@@ -38,4 +36,16 @@ export const girlsMapping: GameMapping = {
   "18-34": ["Chess", "Spoon with Lemon Race", "Badminton"],
   "35 & above": ["Chess", "Spoon with Lemon Race", "Badminton"],
   "Married": ["Chess", "Spoon with Lemon Race", "Badminton", "Musical Chair"]
+};
+
+// Helper function to get games (Required for the build to pass)
+export const getAvailableGameNames = (
+  ageGroup: string,
+  gender: string,
+  maritalStatus?: string
+): string[] => {
+  if (!ageGroup || !gender) return [];
+  if (gender === "Female" && maritalStatus === "Married") return girlsMapping["Married"];
+  const mapping = gender === "Male" ? boysMapping : girlsMapping;
+  return mapping[ageGroup] || [];
 };
