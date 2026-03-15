@@ -1,31 +1,45 @@
-import khoKhoImg from "@/assets/kho-kho.jpg";
-import meterRaceImg from "@/assets/100-meter-race.jpg";
-import longJumpImg from "@/assets/long-jump.jpg";
-import spoonLemonImg from "@/assets/spoon-lemon-race.jpg";
-import musicalChairImg from "@/assets/musical-chair.jpg";
-import volleyballImg from "@/assets/volleyball.jpg";
-import badmintonImg from "@/assets/badminton.jpg";
-import chessImg from "@/assets/chess.jpg";
-import marathonImg from "@/assets/marathon.jpg";
-import slowCycleImg from "@/assets/slow-cycle.jpg";
+// src/lib/gameMapping.ts
 
-const imageMap: Record<string, string> = {
-  "kho-kho": khoKhoImg,
-  "100-meter-race": meterRaceImg,
-  "long-jump": longJumpImg,
-  "spoon-lemon-race": spoonLemonImg,
-  "musical-chair": musicalChairImg,
-  "volleyball": volleyballImg,
-  "badminton": badmintonImg,
-  "chess": chessImg,
-  "marathon": marathonImg,
-  "slow-cycle": slowCycleImg,
+export type GameMapping = Record<string, string[]>;
+
+/**
+ * MALE MAPPING
+ */
+export const boysMapping: GameMapping = {
+  "5": ["100 Meter Race"],
+  "6": ["100 Meter Race"],
+  "7": ["100 Meter Race"],
+  "8": ["100 Meter Race", "Slow Cycle Racing", "Chess"],
+  "9": ["100 Meter Race", "Slow Cycle Racing", "Chess"],
+  "10": ["100 Meter Race", "Slow Cycle Racing", "Chess", "Badminton"],
+  "11": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton"],
+  "12": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton"],
+  "13": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton", "Kho-Kho"],
+  "14": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton", "Kho-Kho"],
+  "15": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton", "Kho-Kho"],
+  "16": ["100 Meter Race", "Long Jump", "Slow Cycle Racing", "Chess", "Badminton", "Kho-Kho"],
+  "17": ["Chess", "Badminton", "Kho-Kho"],
+  "18-34": ["Chess", "Badminton"],
+  "35 & above": ["Long Jump", "Chess", "Badminton", "Marathon", "Volleyball"]
 };
 
-export const getGameImage = (imageKey: string | null): string => {
-  if (!imageKey) return khoKhoImg;
-  if (imageKey.startsWith("http")) return imageKey;
-  return imageMap[imageKey] || khoKhoImg;
+/**
+ * FEMALE MAPPING
+ */
+export const girlsMapping: GameMapping = {
+  "5": ["100 Meter Race"],
+  "6": ["100 Meter Race"],
+  "7": ["100 Meter Race"],
+  "8": ["100 Meter Race", "Chess"],
+  "9": ["100 Meter Race", "Chess"],
+  "10": ["100 Meter Race", "Chess", "Badminton"],
+  "11": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton"],
+  "12": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton"],
+  "13": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton", "Kho-Kho"],
+  "14": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton", "Kho-Kho"],
+  "15": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton", "Kho-Kho"],
+  "16": ["100 Meter Race", "Long Jump", "Chess", "Spoon Race", "Badminton", "Kho-Kho"],
+  "17": ["Chess", "Spoon Race", "Badminton", "Kho-Kho"],
+  "18 & Above": ["Chess", "Spoon Race", "Badminton"],
+  "Married": ["Chess", "Spoon Race", "Badminton", "Musical Chairs"]
 };
-
-export default imageMap;
