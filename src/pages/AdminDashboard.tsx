@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LogOut, Users, Gamepad2, Settings, Trash2, Plus, Save, Pencil, X, Check, Upload, Image, Download, Filter } from "lucide-react";
 import { getGameImage } from "@/lib/gameImages";
-import { classGroups, genderOptions, getAllGameNames } from "@/lib/gameMapping";
+import { ageGroups, genderOptions, getAllGameNames } from "@/lib/gameMapping";
 
 interface Registration {
   id: string;
@@ -15,9 +15,9 @@ interface Registration {
   contact_number: string;
   class: string | null;
   gender: string | null;
+  marital_status: string | null;
   created_at: string;
   games: string[];
-  payment_status: string;
 }
 
 interface Game {
@@ -33,14 +33,14 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"registrations" | "games" | "settings">("registrations");
-  const [classFilter, setClassFilter] = useState<string[]>([]);
-  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
-  const classDropdownRef = useRef<HTMLDivElement>(null);
+  const [ageFilter, setAgeFilter] = useState<string[]>([]);
+  const [ageDropdownOpen, setAgeDropdownOpen] = useState(false);
+  const ageDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (classDropdownRef.current && !classDropdownRef.current.contains(e.target as Node)) {
-        setClassDropdownOpen(false);
+      if (ageDropdownRef.current && !ageDropdownRef.current.contains(e.target as Node)) {
+        setAgeDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -56,7 +56,6 @@ const AdminDashboard = () => {
   const [siteSubtitle, setSiteSubtitle] = useState("");
   const [registrationOpen, setRegistrationOpen] = useState(true);
   const [heroImage, setHeroImage] = useState("");
-  const [upiQrUrl, setUpiQrUrl] = useState("");
 
   // New game state
   const [newGameName, setNewGameName] = useState("");
@@ -148,7 +147,6 @@ const AdminDashboard = () => {
       setSiteSubtitle(map.site_subtitle || "");
       setRegistrationOpen(map.registration_open !== "false");
       setHeroImage(map.hero_image || "");
-      setUpiQrUrl(map.upi_qr_url || "");
       return map;
     },
   });
@@ -164,7 +162,6 @@ const AdminDashboard = () => {
       { key: "site_subtitle", value: siteSubtitle },
       { key: "registration_open", value: registrationOpen ? "true" : "false" },
       { key: "hero_image", value: heroImage },
-      { key: "upi_qr_url", value: upiQrUrl },
     ];
     for (const u of updates) {
       await supabase.from("site_settings").update({ value: u.value }).eq("key", u.key);
@@ -199,14 +196,6 @@ const AdminDashboard = () => {
     toast.success("Registration deleted");
   };
 
-  const handleTogglePayment = async (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === "paid" ? "pending" : "paid";
-    const { error } = await supabase.from("registrations").update({ payment_status: newStatus } as any).eq("id", id);
-    if (error) { toast.error("Failed to update payment status"); return; }
-    queryClient.invalidateQueries({ queryKey: ["admin_registrations"] });
-    toast.success(`Payment marked as ${newStatus}`);
-  };
-
   const startEditing = (game: Game) => {
     setEditingGameId(game.id);
     setEditName(game.name);
@@ -229,7 +218,7 @@ const AdminDashboard = () => {
 
   // Multi-filter registrations
   const filteredRegistrations = registrations.filter(r => {
-    if (classFilter.length > 0 && (!r.class || !classFilter.includes(r.class))) return false;
+    if (ageFilter.length > 0 && (!r.class || !ageFilter.includes(r.class))) return false;
     if (genderFilter !== "all" && r.gender !== genderFilter) return false;
     if (gameFilter !== "all" && !r.games.includes(gameFilter)) return false;
     return true;
@@ -246,16 +235,16 @@ const AdminDashboard = () => {
       Tower: r.tower,
       Flat: r.flat_no,
       Contact: r.contact_number,
-      Class: r.class || '',
+      "Age Group": r.class || '',
       Gender: r.gender || '',
+      "Marital Status": r.marital_status || '',
       Games: r.games.join("; "),
-      Payment: r.payment_status === "paid" ? "Paid" : "Pending",
       Date: new Date(r.created_at).toLocaleDateString(),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrations");
-    const filterLabel = [classFilter.length > 0 ? classFilter.join("+") : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
+    const filterLabel = [ageFilter.length > 0 ? ageFilter.join("+") : "", genderFilter !== "all" ? genderFilter : "", gameFilter !== "all" ? gameFilter : ""].filter(Boolean).join("-");
     XLSX.writeFile(wb, `registrations${filterLabel ? `-${filterLabel}` : ""}.xlsx`);
     toast.success("Excel file downloaded!");
   };
@@ -303,35 +292,35 @@ const AdminDashboard = () => {
               </h2>
               <div className="flex gap-2 flex-wrap items-center">
                 <Filter className="w-4 h-4 text-muted-foreground" />
-                {/* Class Filter - Multi-select */}
-                <div className="relative" ref={classDropdownRef}>
+                {/* Age Group Filter - Multi-select */}
+                <div className="relative" ref={ageDropdownRef}>
                   <button
-                    onClick={() => setClassDropdownOpen(!classDropdownOpen)}
+                    onClick={() => setAgeDropdownOpen(!ageDropdownOpen)}
                     className="px-3 py-1.5 rounded-md bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary min-w-[120px] text-left"
                   >
-                    {classFilter.length === 0 ? "All Classes" : `${classFilter.length} selected`}
+                    {ageFilter.length === 0 ? "All Ages" : `${ageFilter.length} selected`}
                   </button>
-                  {classDropdownOpen && (
+                  {ageDropdownOpen && (
                     <div className="absolute z-50 mt-1 bg-card border border-border rounded-md shadow-lg p-2 min-w-[160px] max-h-60 overflow-y-auto">
                       <button
-                        onClick={() => setClassFilter([])}
+                        onClick={() => setAgeFilter([])}
                         className="w-full text-left px-2 py-1 text-xs text-muted-foreground hover:text-foreground mb-1"
                       >
                         Clear all
                       </button>
-                      {classGroups.map(c => (
-                        <label key={c} className="flex items-center gap-2 px-2 py-1 hover:bg-muted rounded cursor-pointer text-sm text-foreground">
+                      {ageGroups.map(a => (
+                        <label key={a} className="flex items-center gap-2 px-2 py-1 hover:bg-muted rounded cursor-pointer text-sm text-foreground">
                           <input
                             type="checkbox"
-                            checked={classFilter.includes(c)}
+                            checked={ageFilter.includes(a)}
                             onChange={() => {
-                              setClassFilter(prev =>
-                                prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+                              setAgeFilter(prev =>
+                                prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]
                               );
                             }}
                             className="accent-primary"
                           />
-                          {c}
+                          {a}
                         </label>
                       ))}
                     </div>
@@ -378,11 +367,11 @@ const AdminDashboard = () => {
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Tower</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Flat</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Contact</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Class</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Age Group</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Gender</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Marital Status</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Games</th>
                       <th className="text-left py-3 px-4 text-muted-foreground font-medium">Date</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Payment</th>
                       <th className="py-3 px-4"></th>
                     </tr>
                   </thead>
@@ -395,6 +384,7 @@ const AdminDashboard = () => {
                         <td className="py-3 px-4 text-foreground">{reg.contact_number}</td>
                         <td className="py-3 px-4 text-foreground">{reg.class || '-'}</td>
                         <td className="py-3 px-4 text-foreground">{reg.gender || '-'}</td>
+                        <td className="py-3 px-4 text-foreground">{reg.marital_status || '-'}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-1 flex-wrap">
                             {reg.games.map(g => (
@@ -403,18 +393,6 @@ const AdminDashboard = () => {
                           </div>
                         </td>
                         <td className="py-3 px-4 text-muted-foreground">{new Date(reg.created_at).toLocaleDateString()}</td>
-                        <td className="py-3 px-4">
-                          <button
-                            onClick={() => handleTogglePayment(reg.id, reg.payment_status)}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                              reg.payment_status === "paid"
-                                ? "bg-secondary/20 text-secondary"
-                                : "bg-destructive/20 text-destructive"
-                            }`}
-                          >
-                            {reg.payment_status === "paid" ? "Paid ✓" : "Pending"}
-                          </button>
-                        </td>
                         <td className="py-3 px-4">
                           <button onClick={() => handleDeleteRegistration(reg.id)} className="text-destructive hover:text-destructive/80">
                             <Trash2 className="w-4 h-4" />
@@ -461,6 +439,8 @@ const AdminDashboard = () => {
                     <option value="carrom">Carrom</option>
                     <option value="table-tennis">Table Tennis</option>
                     <option value="tug-of-war">Tug of War</option>
+                    <option value="marathon">Marathon</option>
+                    <option value="slow-cycle">Slow Cycle</option>
                   </select>
                   <label className="cursor-pointer px-3 py-2 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                     <Upload className="w-4 h-4" />
@@ -495,6 +475,8 @@ const AdminDashboard = () => {
                         <option value="carrom">Carrom</option>
                         <option value="table-tennis">Table Tennis</option>
                         <option value="tug-of-war">Tug of War</option>
+                        <option value="marathon">Marathon</option>
+                        <option value="slow-cycle">Slow Cycle</option>
                       </select>
                       <label className="cursor-pointer px-3 py-2 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">
                         <Upload className="w-4 h-4" />
@@ -576,30 +558,6 @@ const AdminDashboard = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">This image appears behind the title on the homepage. Click Save to apply.</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">UPI Payment QR Code</label>
-                <div className="flex gap-2 items-center">
-                  {upiQrUrl && (
-                    <img src={upiQrUrl} alt="UPI QR" className="w-16 h-16 rounded object-contain ring-1 ring-border bg-white p-1" />
-                  )}
-                  <label className="cursor-pointer flex-1 px-4 py-3 rounded-md bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    <span>{uploading ? "Uploading..." : upiQrUrl ? "Change QR" : "Upload QR"}</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const url = await uploadImage(file);
-                      if (url) setUpiQrUrl(url);
-                    }} disabled={uploading} />
-                  </label>
-                  {upiQrUrl && (
-                    <button onClick={() => setUpiQrUrl("")} className="p-2 rounded-md text-destructive hover:text-destructive/80">
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Upload your UPI QR code. It will be shown to users after registration. Click Save to apply.</p>
               </div>
               <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-muted-foreground">Registration Open</label>

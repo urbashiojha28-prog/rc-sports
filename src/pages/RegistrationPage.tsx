@@ -2,13 +2,12 @@ import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getGameImage } from "@/lib/gameImages";
-import { getAvailableGameNames } from "@/lib/gameMapping";
+import { getAvailableGameNames, ageGroups } from "@/lib/gameMapping";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
-import heroBanner from "@/assets/hero-banner.jpg";
 import sportsIllustration from "@/assets/sports-illustration.png";
-import { User, Phone, Home, GraduationCap } from "lucide-react";
+import { User, Phone, Home } from "lucide-react";
 
 interface Game {
   id: string;
@@ -24,8 +23,9 @@ const RegistrationPage = () => {
   const [tower, setTower] = useState("");
   const [flatNo, setFlatNo] = useState("");
   const [contact, setContact] = useState("");
-  const [studentClass, setStudentClass] = useState("");
+  const [ageGroup, setAgeGroup] = useState("");
   const [gender, setGender] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
@@ -60,8 +60,11 @@ const RegistrationPage = () => {
   const siteSubtitle = settings?.site_subtitle || "Register now and compete!";
   const registrationOpen = settings?.registration_open !== "false";
 
-  // Filter games based on class + gender
-  const allowedGameNames = getAvailableGameNames(studentClass, gender);
+  // Show married/unmarried only for Female + Senior (35+)
+  const showMaritalStatus = gender === "Female" && ageGroup === "35+";
+
+  // Filter games based on age group + gender + marital status
+  const allowedGameNames = getAvailableGameNames(ageGroup, gender, maritalStatus);
   const availableGames = games.filter(g => allowedGameNames.includes(g.name));
 
   const toggleGame = (gameId: string) => {
@@ -88,8 +91,12 @@ const RegistrationPage = () => {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim() || !studentClass || !gender) {
+    if (!name.trim() || !tower.trim() || !flatNo.trim() || !contact.trim() || !ageGroup || !gender) {
       toast.error("Please fill all fields!");
+      return;
+    }
+    if (showMaritalStatus && !maritalStatus) {
+      toast.error("Please select marital status!");
       return;
     }
     if (!/^\d{10}$/.test(contact)) {
@@ -118,9 +125,10 @@ const RegistrationPage = () => {
           tower: tower.trim(),
           flat_no: flatNo.trim(),
           contact_number: contact.trim(),
-          class: studentClass.trim(),
+          class: ageGroup,
           gender: gender,
-        });
+          marital_status: showMaritalStatus ? maritalStatus : null,
+        } as any);
 
       if (regError) {
         if (regError.code === '23505' || regError.message?.includes('duplicate') || regError.message?.includes('unique')) {
@@ -153,8 +161,6 @@ const RegistrationPage = () => {
     }
   };
 
-  const upiQrUrl = settings?.upi_qr_url;
-
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -164,25 +170,6 @@ const RegistrationPage = () => {
           <p className="text-muted-foreground text-lg mb-8">
             Your registration has been submitted successfully. 🏆
           </p>
-
-          {upiQrUrl && (
-            <div className="bg-card rounded-2xl p-6 ring-1 ring-border shadow-lg">
-              <h2 className="font-heading text-2xl text-foreground mb-2">Complete Payment</h2>
-              <p className="text-muted-foreground text-sm mb-4">
-                Scan the QR code below to pay the registration fee via UPI
-              </p>
-              <div className="bg-white rounded-xl p-4 inline-block mb-4">
-                <img
-                  src={upiQrUrl}
-                  alt="UPI QR Code"
-                  className="w-48 h-48 object-contain mx-auto"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                After payment, your registration will be confirmed by the admin.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -281,36 +268,58 @@ const RegistrationPage = () => {
                       </div>
                     </div>
 
-                    {/* Class & Gender */}
+                    {/* Age Group & Gender */}
                     <div className="grid grid-cols-2 gap-6">
-                      <div className="relative">
+                      <div>
                         <select
-                          value={studentClass}
-                          onChange={(e) => setStudentClass(e.target.value)}
+                          value={ageGroup}
+                          onChange={(e) => {
+                            setAgeGroup(e.target.value);
+                            // Reset marital status when age group changes
+                            if (e.target.value !== "35+") setMaritalStatus("");
+                          }}
                           className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none text-base cursor-pointer"
                           required
                         >
-                          <option value="" className="bg-card text-foreground">Class</option>
-                          {["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","Senior"].map(c => (
-                            <option key={c} value={c} className="bg-card text-foreground">{c}</option>
+                          <option value="" className="bg-card text-foreground">Age Group</option>
+                          {ageGroups.map(a => (
+                            <option key={a} value={a} className="bg-card text-foreground">{a}</option>
                           ))}
                         </select>
-                        <GraduationCap className="absolute right-1 top-3.5 w-5 h-5 text-muted-foreground pointer-events-none" />
                       </div>
                       <div>
                         <select
                           value={gender}
-                          onChange={(e) => setGender(e.target.value)}
+                          onChange={(e) => {
+                            setGender(e.target.value);
+                            // Reset marital status when gender changes
+                            if (e.target.value !== "Female") setMaritalStatus("");
+                          }}
                           className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none text-base cursor-pointer"
                           required
                         >
                           <option value="" className="bg-card text-foreground">Gender</option>
                           <option value="Male" className="bg-card text-foreground">Male</option>
                           <option value="Female" className="bg-card text-foreground">Female</option>
-                          <option value="Other" className="bg-card text-foreground">Other</option>
                         </select>
                       </div>
                     </div>
+
+                    {/* Marital Status - only for Female + 35+ */}
+                    {showMaritalStatus && (
+                      <div>
+                        <select
+                          value={maritalStatus}
+                          onChange={(e) => setMaritalStatus(e.target.value)}
+                          className="w-full bg-transparent border-b-2 border-foreground/20 py-3 px-1 text-foreground focus:outline-none focus:border-primary transition-colors appearance-none text-base cursor-pointer"
+                          required
+                        >
+                          <option value="" className="bg-card text-foreground">Marital Status</option>
+                          <option value="Married" className="bg-card text-foreground">Married</option>
+                          <option value="Unmarried" className="bg-card text-foreground">Unmarried</option>
+                        </select>
+                      </div>
+                    )}
 
                     {/* Submit Button */}
                     <button
@@ -326,7 +335,7 @@ const RegistrationPage = () => {
                   </form>
                 </div>
 
-                {/* Right: Image (exact copy from reference) */}
+                {/* Right: Image */}
                 <div className="hidden md:block relative p-4">
                   <img
                     src={sportsIllustration}
@@ -344,7 +353,8 @@ const RegistrationPage = () => {
               <div className="max-w-5xl mx-auto mb-6">
                 <div className="bg-card rounded-lg p-4 ring-1 ring-border flex flex-wrap items-center justify-between gap-2">
                   <div className="text-sm text-muted-foreground">
-                    <span className="text-foreground font-medium">{name}</span> · {studentClass} · {gender} · {tower}, {flatNo}
+                    <span className="text-foreground font-medium">{name}</span> · Age {ageGroup} · {gender}
+                    {showMaritalStatus && maritalStatus ? ` · ${maritalStatus}` : ""} · {tower}, {flatNo}
                   </div>
                   <button
                     onClick={() => setStep("details")}
@@ -402,7 +412,7 @@ const RegistrationPage = () => {
                 </div>
 
                 {availableGames.length === 0 && (
-                  <p className="text-center text-muted-foreground mt-8">No games available for your class and gender combination.</p>
+                  <p className="text-center text-muted-foreground mt-8">No games available for your age group and gender combination.</p>
                 )}
               </section>
 

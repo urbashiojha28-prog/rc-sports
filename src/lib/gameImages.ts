@@ -3,8 +3,11 @@ import meterRaceImg from "@/assets/100-meter-race.jpg";
 import longJumpImg from "@/assets/long-jump.jpg";
 import spoonLemonImg from "@/assets/spoon-lemon-race.jpg";
 import musicalChairImg from "@/assets/musical-chair.jpg";
-import drawingImg from "@/assets/drawing-competition.jpg";
 import volleyballImg from "@/assets/volleyball.jpg";
+import badmintonImg from "@/assets/badminton.jpg";
+import chessImg from "@/assets/chess.jpg";
+import marathonImg from "@/assets/marathon.jpg";
+import slowCycleImg from "@/assets/slow-cycle.jpg";
 
 const imageMap: Record<string, string> = {
   "kho-kho": khoKhoImg,
@@ -12,8 +15,11 @@ const imageMap: Record<string, string> = {
   "long-jump": longJumpImg,
   "spoon-lemon-race": spoonLemonImg,
   "musical-chair": musicalChairImg,
-  "drawing-competition": drawingImg,
   "volleyball": volleyballImg,
+  "badminton": badmintonImg,
+  "chess": chessImg,
+  "marathon": marathonImg,
+  "slow-cycle": slowCycleImg,
 };
 
 export const getGameImage = (imageKey: string | null): string => {
